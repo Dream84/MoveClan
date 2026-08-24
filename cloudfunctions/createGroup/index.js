@@ -42,6 +42,7 @@ exports.main = async (event) => {
 
     const addRes = await db.collection('groups').add({
       data: {
+        _openid: OPENID,
         name,
         description,
         sportTheme,
@@ -55,6 +56,7 @@ exports.main = async (event) => {
 
     await db.collection('group_members').add({
       data: {
+        _openid: OPENID,
         groupId: addRes._id,
         openid: OPENID,
         role: 'owner',

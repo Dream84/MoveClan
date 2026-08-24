@@ -17,6 +17,7 @@ exports.main = async (event) => {
     if (res.data.length === 0) {
       const addRes = await users.add({
         data: {
+          _openid: OPENID,
           openid: OPENID,
           nickName: nickName || '微信用户',
           avatarUrl: avatarUrl || '',

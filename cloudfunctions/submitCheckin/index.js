@@ -98,6 +98,7 @@ exports.main = async (event) => {
 
     const addRes = await db.collection('checkins').add({
       data: {
+        _openid: OPENID,
         groupId: v.groupId,
         openid: OPENID,
         checkDate: v.checkDate,

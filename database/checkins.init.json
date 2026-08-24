@@ -23,6 +23,7 @@
   "sampleDocs": [
     {
       "_id": "example",
+      "_openid": "oYOUR_OPENID_HERE",
       "groupId": "example_group_id",
       "openid": "oYOUR_OPENID_HERE",
       "checkDate": "2026-08-24",

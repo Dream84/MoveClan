@@ -21,6 +21,7 @@
   "sampleDocs": [
     {
       "_id": "example",
+      "_openid": "oYOUR_OPENID_HERE",
       "name": "早起跑步打卡群",
       "description": "每天 7 点前跑步 3 公里",
       "sportTheme": "running",

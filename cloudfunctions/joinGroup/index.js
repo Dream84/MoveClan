@@ -35,6 +35,7 @@ exports.main = async (event) => {
 
     await db.collection('group_members').add({
       data: {
+        _openid: OPENID,
         groupId: group._id,
         openid: OPENID,
         role: 'member',
