@@ -93,6 +93,8 @@ Page({
     })
   },
 
+  noop() {},
+
   closeEdit() {
     this.setData({ showEdit: false })
   },

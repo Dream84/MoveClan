@@ -40,7 +40,7 @@
   </view>
 
   <view class="modal-mask" wx:if="{{showCreate}}" bindtap="closeCreate">
-    <view class="modal card" catchtap="">
+    <view class="modal card" catchtap="noop">
       <view class="modal-title">创建运动群</view>
       <input class="modal-input" placeholder="群名称（必填）" maxlength="20" value="{{createName}}" bindinput="onNameInput" />
       <input class="modal-input" placeholder="群简介（可选）" maxlength="100" value="{{createDesc}}" bindinput="onDescInput" />

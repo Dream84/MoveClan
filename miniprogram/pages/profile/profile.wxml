@@ -52,7 +52,7 @@
   </view>
 
   <view class="modal-mask" wx:if="{{showEdit}}" bindtap="closeEdit">
-    <view class="modal card" catchtap="">
+    <view class="modal card" catchtap="noop">
       <view class="modal-title">编辑资料</view>
       <button class="choose-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <image wx:if="{{editAvatarTemp}}" class="choose-avatar" src="{{editAvatarTemp}}" mode="aspectFill"></image>

@@ -67,6 +67,11 @@ Page({
     })
   },
 
+  onMemberRowTap(e) {
+    if (!this.data.isOwner) return
+    this.onMemberAction(e)
+  },
+
   onMemberAction(e) {
     const member = this.data.members[e.currentTarget.dataset.index]
     if (!member || member.isOwner) return

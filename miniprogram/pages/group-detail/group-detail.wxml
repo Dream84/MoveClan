@@ -20,7 +20,7 @@
       wx:for="{{members}}"
       wx:key="_id"
       data-index="{{index}}"
-      bindtap="{{isOwner ? 'onMemberAction' : ''}}"
+      bindtap="onMemberRowTap"
     >
       <view class="member-avatar-wrap">
         <image wx:if="{{item.avatarUrl}}" class="member-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>

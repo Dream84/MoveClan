@@ -64,6 +64,8 @@ Page({
     this.setData({ showCreate: true })
   },
 
+  noop() {},
+
   closeCreate() {
     this.setData({ showCreate: false })
   },
