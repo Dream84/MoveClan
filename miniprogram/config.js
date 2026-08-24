@@ -1,5 +1,5 @@
 module.exports = {
-  CLOUD_ENV_ID: 'cloudbase-d3gv9i4sc4abe426d',
+  CLOUD_ENV_ID: 'aaaa',
   SUBSCRIBE_TEMPLATE_ID: '',
   CONTENT_CHECK_ENABLED: true
 }
