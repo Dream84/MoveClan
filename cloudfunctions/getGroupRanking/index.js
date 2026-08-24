@@ -69,6 +69,16 @@ exports.main = async (event) => {
       userMap[m.openid] = { nickName: m.nickName, avatarUrl: m.avatarUrl }
     })
 
+    const openids = members.map(m => m.openid)
+    if (openids.length) {
+      const userRes = await db.collection('users').where({ openid: _.in(openids) }).get()
+      userRes.data.forEach(u => {
+        if (u.openid) {
+          userMap[u.openid] = { nickName: u.nickName || '微信用户', avatarUrl: u.avatarUrl || '' }
+        }
+      })
+    }
+
     const range = todayCN()
     const start = period === 'week' ? range.weekStart : range.monthStart
     const end = period === 'week' ? range.weekEnd : range.monthEnd

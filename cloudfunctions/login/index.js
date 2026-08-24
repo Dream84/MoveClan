@@ -2,6 +2,15 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+async function syncMembership(openid, nickName, avatarUrl) {
+  const res = await db.collection('group_members').where({ openid }).limit(1000).get()
+  for (const m of res.data) {
+    await db.collection('group_members').doc(m._id).update({
+      data: { nickName, avatarUrl }
+    })
+  }
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   if (!OPENID) {
@@ -15,26 +24,29 @@ exports.main = async (event) => {
     const res = await users.where({ openid: OPENID }).get()
 
     if (res.data.length === 0) {
+      const effectiveNick = nickName || '微信用户'
+      const effectiveAvatar = avatarUrl || ''
       const addRes = await users.add({
         data: {
           _openid: OPENID,
           openid: OPENID,
-          nickName: nickName || '微信用户',
-          avatarUrl: avatarUrl || '',
+          nickName: effectiveNick,
+          avatarUrl: effectiveAvatar,
           joinTime: db.serverDate(),
           defaultGroupId: '',
           maxStreakDays: 0,
           achievedMilestones: []
         }
       })
+      await syncMembership(OPENID, effectiveNick, effectiveAvatar)
       return {
         code: 0,
         message: 'ok',
         data: {
           _id: addRes._id,
           openid: OPENID,
-          nickName: nickName || '微信用户',
-          avatarUrl: avatarUrl || '',
+          nickName: effectiveNick,
+          avatarUrl: effectiveAvatar,
           isNew: true
         }
       }
@@ -44,13 +56,15 @@ exports.main = async (event) => {
     const updateData = {}
     if (nickName && nickName !== u.nickName) updateData.nickName = nickName
     if (avatarUrl && avatarUrl !== u.avatarUrl) updateData.avatarUrl = avatarUrl
+    const finalUser = Object.assign({}, u, updateData)
     if (Object.keys(updateData).length) {
       await users.doc(u._id).update({ data: updateData })
+      await syncMembership(OPENID, finalUser.nickName, finalUser.avatarUrl)
     }
     return {
       code: 0,
       message: 'ok',
-      data: Object.assign({}, u, updateData, { isNew: false })
+      data: Object.assign({}, finalUser, { isNew: false })
     }
   } catch (err) {
     console.error('[login]', err)

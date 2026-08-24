@@ -1,6 +1,7 @@
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -24,12 +25,26 @@ exports.main = async (event) => {
 
     const res = await db.collection('group_members').where({ groupId }).limit(1000).get()
     const members = res.data
-    members.sort((a, b) => {
+
+    const openids = members.map(m => m.openid)
+    const userMap = {}
+    if (openids.length) {
+      const userRes = await db.collection('users').where({ openid: _.in(openids) }).get()
+      userRes.data.forEach(u => {
+        if (u.openid) userMap[u.openid] = u
+      })
+    }
+    const merged = members.map(m => ({
+      ...m,
+      nickName: (userMap[m.openid] && userMap[m.openid].nickName) || m.nickName,
+      avatarUrl: (userMap[m.openid] && userMap[m.openid].avatarUrl) || m.avatarUrl
+    }))
+    merged.sort((a, b) => {
       if (a.role === b.role) return 0
       return a.role === 'owner' ? -1 : 1
     })
 
-    return { code: 0, message: 'ok', data: { members } }
+    return { code: 0, message: 'ok', data: { members: merged } }
   } catch (err) {
     console.error('[getGroupMembers]', err)
     return { code: 500, message: '获取成员列表失败' }

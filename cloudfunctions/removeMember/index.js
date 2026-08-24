@@ -32,6 +32,7 @@ exports.main = async (event) => {
       .get()
     if (target.data.length) {
       await db.collection('group_members').doc(target.data[0]._id).remove()
+      await db.collection('checkins').where({ groupId, openid: targetOpenid }).remove()
       await db.collection('groups').doc(groupId).update({
         data: { memberCount: _.inc(-1) }
       })

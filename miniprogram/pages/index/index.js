@@ -140,5 +140,29 @@ Page({
 
   goGroups() {
     wx.switchTab({ url: '/pages/groups/groups' })
+  },
+
+  async useWechatProfile() {
+    try {
+      const { userInfo } = await wx.getUserProfile({ desc: '用于展示您的昵称和头像' })
+      if (!userInfo || !userInfo.nickName) return
+      wx.showLoading({ title: '设置中...', mask: true })
+      let avatarUrl = ''
+      if (userInfo.avatarUrl) {
+        const up = await api.uploadImage(userInfo.avatarUrl, 'profile', null)
+        avatarUrl = up.fileID
+      }
+      const user = await api.call('login', { nickName: userInfo.nickName, avatarUrl }, { loading: false })
+      app.setUserInfo(user)
+      this.setData({ userInfo: user })
+      wx.showToast({ title: '已使用微信资料', icon: 'success' })
+    } catch (err) {
+      console.error('[useWechatProfile]', err)
+      if (err && err.errMsg && err.errMsg.indexOf('deny') >= 0) {
+        wx.showToast({ title: '已取消授权', icon: 'none' })
+      }
+    } finally {
+      wx.hideLoading()
+    }
   }
 })

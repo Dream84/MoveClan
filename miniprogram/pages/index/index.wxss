@@ -32,6 +32,38 @@
   margin-left: 24rpx;
 }
 
+.profile-tip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 28rpx;
+  margin-bottom: 28rpx;
+}
+
+.profile-tip-text {
+  flex: 1;
+  min-width: 0;
+  margin-right: 20rpx;
+}
+
+.profile-tip-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.profile-tip-sub {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  margin-top: 6rpx;
+}
+
+.tip-btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 14rpx 32rpx;
+  font-size: 26rpx;
+}
+
 .greeting {
   font-size: 36rpx;
   font-weight: 800;

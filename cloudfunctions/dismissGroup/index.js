@@ -1,6 +1,16 @@
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
+
+async function removeAll(collectionName, where) {
+  while (true) {
+    const res = await db.collection(collectionName).where(where).limit(100).get()
+    if (!res.data.length) break
+    const ids = res.data.map(d => d._id)
+    await db.collection(collectionName).where({ _id: _.in(ids) }).remove()
+  }
+}
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -17,9 +27,9 @@ exports.main = async (event) => {
       return { code: 3, message: '仅群主可解散群' }
     }
 
-    await db.collection('groups').doc(groupId).update({
-      data: { status: 'dismissed' }
-    })
+    await removeAll('group_members', { groupId })
+    await removeAll('checkins', { groupId })
+    await db.collection('groups').doc(groupId).remove()
 
     return { code: 0, message: 'ok', data: {} }
   } catch (err) {

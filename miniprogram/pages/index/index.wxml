@@ -10,6 +10,14 @@
     </view>
   </view>
 
+  <view class="profile-tip card" wx:if="{{userInfo && !userInfo.avatarUrl}}">
+    <view class="profile-tip-text">
+      <view class="profile-tip-title">设置头像昵称</view>
+      <view class="profile-tip-sub">一键使用微信昵称和头像作为默认资料</view>
+    </view>
+    <button class="btn-primary tip-btn" bindtap="useWechatProfile">一键设置</button>
+  </view>
+
   <view class="main-area">
     <picker wx:if="{{groups.length > 1}}" mode="selector" range="{{groups}}" range-key="name" value="{{groupIndex}}" bindchange="onGroupChange">
       <view class="group-select">
