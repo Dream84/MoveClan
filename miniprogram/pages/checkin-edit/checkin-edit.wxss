@@ -1,0 +1,200 @@
+.page {
+  padding: 32rpx 32rpx 80rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.form-row:first-child {
+  padding-top: 8rpx;
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-sub);
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+
+.form-value {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.arrow {
+  color: var(--text-light);
+  margin-left: 8rpx;
+}
+
+.form-input {
+  text-align: right;
+  font-size: 30rpx;
+  width: 320rpx;
+}
+
+.form-input-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.estimate-btn {
+  font-size: 24rpx;
+  color: var(--primary);
+  background: var(--primary-bg);
+  border-radius: 12rpx;
+  padding: 6rpx 16rpx;
+  margin-left: 12rpx;
+}
+
+.hint {
+  text-align: right;
+  font-size: 22rpx;
+  color: var(--text-light);
+  margin-top: 8rpx;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.step-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.step-btn.disabled {
+  opacity: 0.4;
+}
+
+.step-num {
+  font-size: 32rpx;
+  font-weight: 700;
+  min-width: 48rpx;
+  text-align: center;
+}
+
+.image-area {
+  min-width: 300rpx;
+}
+
+.image-add {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed var(--primary-light);
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 24rpx;
+  gap: 8rpx;
+}
+
+.image-add .plus {
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.image-preview {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.preview-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 24rpx;
+}
+
+.image-remove {
+  position: absolute;
+  top: -14rpx;
+  right: -14rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-uploading {
+  width: 320rpx;
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+.progress-bar {
+  margin-top: 16rpx;
+  height: 12rpx;
+  background: #F0F0F0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-inner {
+  height: 100%;
+  background: linear-gradient(135deg, #FF9A62, #FF6A3D);
+  border-radius: 8rpx;
+  transition: width 0.2s;
+}
+
+.textarea-row {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.remark {
+  width: 100%;
+  min-height: 160rpx;
+  background: #FFF7F0;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.remark-count {
+  align-self: flex-end;
+  font-size: 22rpx;
+  color: var(--text-light);
+  margin-top: 8rpx;
+}
+
+.submit-btn {
+  margin-top: 48rpx;
+  padding: 28rpx 0;
+}
+
+.delete-btn {
+  margin-top: 24rpx;
+  padding: 24rpx 0;
+}

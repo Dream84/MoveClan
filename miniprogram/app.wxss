@@ -1,0 +1,101 @@
+page {
+  --primary: #FF7A45;
+  --primary-light: #FFB38A;
+  --primary-bg: #FFF3EC;
+  --accent-blue: #4A90E2;
+  --accent-green: #34C77B;
+  --bg: #FFF7F0;
+  --card-bg: rgba(255, 255, 255, 0.78);
+  --text-main: #2C2C2C;
+  --text-sub: #9AA0A6;
+  --text-light: #C4C9CE;
+  --border: rgba(255, 122, 69, 0.12);
+  --radius-lg: 32rpx;
+  --radius-md: 24rpx;
+  --radius-sm: 16rpx;
+  --shadow-soft: 0 12rpx 32rpx rgba(255, 122, 69, 0.12);
+  --shadow-light: 0 6rpx 16rpx rgba(44, 44, 44, 0.06);
+
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF9A62, #FF6A3D);
+  color: #FFFFFF;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  box-shadow: 0 12rpx 24rpx rgba(255, 106, 61, 0.35);
+  border: none;
+}
+
+.btn-primary.btn-hover {
+  transform: translateY(2rpx);
+  box-shadow: 0 6rpx 12rpx rgba(255, 106, 61, 0.3);
+}
+
+.btn-ghost {
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.btn-danger {
+  background: #FFF1F0;
+  color: #F5222D;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.placeholder {
+  color: var(--text-light);
+}
+
+.loading-mask {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+  color: var(--text-sub);
+  font-size: 26rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  color: var(--text-sub);
+  padding: 60rpx 0;
+  font-size: 26rpx;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 40rpx;
+  font-weight: 700;
+  background: linear-gradient(135deg, #FF9A62, #FF6A3D);
+}

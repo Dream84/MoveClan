@@ -1,0 +1,45 @@
+<view class="page" wx:if="{{group}}">
+  <view class="detail-card card">
+    <view class="detail-name">{{group.name}}</view>
+    <view class="detail-theme">{{group.themeLabel || '综合'}}</view>
+    <view wx:if="{{group.description}}" class="detail-desc">{{group.description}}</view>
+
+    <view class="invite-row">
+      <view class="invite-info">
+        <view class="invite-label">群邀请码</view>
+        <view class="invite-code">{{group.inviteCode}}</view>
+      </view>
+      <button class="btn-primary invite-btn" bindtap="copyInvite">复制</button>
+    </view>
+  </view>
+
+  <view class="section-title">成员列表（{{members.length}}）</view>
+  <view class="member-card card">
+    <view
+      class="member-item"
+      wx:for="{{members}}"
+      wx:key="_id"
+      data-index="{{index}}"
+      bindtap="{{isOwner ? 'onMemberAction' : ''}}"
+    >
+      <view class="member-avatar-wrap">
+        <image wx:if="{{item.avatarUrl}}" class="member-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="member-avatar avatar-fallback">{{item.nickName[0]}}</view>
+      </view>
+      <view class="member-info">
+        <view class="member-name">
+          {{item.nickName}}
+          <text class="owner-tag" wx:if="{{item.isOwner}}">{{item.roleLabel}}</text>
+        </view>
+      </view>
+      <text wx:if="{{isOwner && !item.isOwner}}" class="member-remove">移除</text>
+    </view>
+  </view>
+
+  <view class="bottom-actions">
+    <button wx:if="{{isOwner}}" class="btn-danger action-btn" bindtap="onDismiss">解散群组</button>
+    <button wx:elif="{{isMember}}" class="btn-danger action-btn" bindtap="onLeave">退出群组</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-mask">加载中...</view>
+</view>

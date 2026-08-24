@@ -1,0 +1,95 @@
+<view class="page">
+  <view class="form-card card">
+    <view class="form-row">
+      <text class="form-label">运动群</text>
+      <picker wx:if="{{mode === 'new' && groups.length > 1}}" mode="selector" range="{{groups}}" range-key="name" value="{{groupIndex}}" bindchange="onGroupChange">
+        <view class="form-value">{{groupLabel}} <text class="arrow">▾</text></view>
+      </picker>
+      <view wx:else class="form-value">{{groupLabel}}</view>
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">打卡日期</text>
+      <picker mode="date" value="{{checkDate}}" start="{{dateStart}}" end="{{dateEnd}}" bindchange="onDateChange">
+        <view class="form-value">{{checkDate}} <text class="arrow">▾</text></view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">运动类型</text>
+      <picker mode="selector" range="{{sportTypes}}" range-key="label" value="{{sportIndex}}" bindchange="onSportChange">
+        <view class="form-value">{{sportTypes[sportIndex].label}} <text class="arrow">▾</text></view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">运动时长（分钟）</text>
+      <input class="form-input" type="number" placeholder="如 30" value="{{duration}}" bindinput="onDurationInput" />
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">消耗卡路里（千卡）</text>
+      <view class="form-input-wrap">
+        <input class="form-input" type="number" placeholder="如 300" value="{{calories}}" bindinput="onCaloriesInput" />
+        <text class="estimate-btn" bindtap="estimateCalories">估算</text>
+      </view>
+    </view>
+    <view class="hint" wx:if="{{estimateHint}}">{{estimateHint}}</view>
+
+    <view class="form-row">
+      <text class="form-label">打卡次数</text>
+      <view class="stepper">
+        <view class="step-btn {{count <= 1 ? 'disabled' : ''}}" bindtap="onCountMinus">－</view>
+        <view class="step-num">{{count}}</view>
+        <view class="step-btn {{count >= 100 ? 'disabled' : ''}}" bindtap="onCountPlus">＋</view>
+      </view>
+    </view>
+
+    <view class="form-row image-row">
+      <text class="form-label">打卡截图</text>
+      <view class="image-area">
+        <view wx:if="{{uploading}}" class="image-uploading">
+          <text>上传中 {{uploadProgress}}%</text>
+          <view class="progress-bar">
+            <view class="progress-inner" style="width: {{uploadProgress}}%"></view>
+          </view>
+        </view>
+        <block wx:else>
+          <view wx:if="{{imageUrl}}" class="image-preview">
+            <image class="preview-img" src="{{imageUrl}}" mode="aspectFill"></image>
+            <view class="image-remove" catchtap="removeImage">×</view>
+          </view>
+          <view wx:else class="image-add" bindtap="chooseImage">
+            <text class="plus">＋</text>
+            <text>拍照/相册</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="form-row textarea-row">
+      <text class="form-label">备注（可选）</text>
+      <textarea
+        class="remark"
+        placeholder="记录今天的运动感受…"
+        maxlength="200"
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+      ></textarea>
+      <view class="remark-count">{{remarkCount}}/200</view>
+    </view>
+  </view>
+
+  <button class="btn-primary submit-btn" bindtap="submit" disabled="{{submitting}}">
+    {{mode === 'edit' ? '保存修改' : '立即打卡'}}
+  </button>
+
+  <button wx:if="{{mode === 'edit'}}" class="btn-danger delete-btn" bindtap="deleteRecord">删除记录</button>
+
+  <confetti
+    show="{{showConfetti}}"
+    title="{{confettiTitle}}"
+    text="{{confettiText}}"
+    bindclose="onConfettiClose"
+  />
+</view>

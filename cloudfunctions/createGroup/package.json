@@ -1,0 +1,9 @@
+{
+  "name": "createGroup",
+  "version": "1.0.0",
+  "description": "创建运动群并生成邀请码",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

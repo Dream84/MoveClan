@@ -1,0 +1,17 @@
+<view class="confetti-overlay" wx:if="{{show}}">
+  <view class="confetti-canvas">
+    <view
+      class="piece shape-{{item.shape}}"
+      wx:for="{{pieces}}"
+      wx:key="index"
+      style="left: {{item.left}}%; width: {{item.size}}rpx; height: {{item.size}}rpx; background: {{item.color}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s;"
+    ></view>
+  </view>
+
+  <view class="confetti-card">
+    <view class="confetti-emoji">🎉</view>
+    <view class="confetti-title">{{title}}</view>
+    <view class="confetti-text">{{text}}</view>
+    <button class="confetti-btn" bindtap="close">太棒了！</button>
+  </view>
+</view>

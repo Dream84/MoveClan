@@ -1,0 +1,9 @@
+{
+  "name": "leaveGroup",
+  "version": "1.0.0",
+  "description": "成员退出群（群主退出即解散）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

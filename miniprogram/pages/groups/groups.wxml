@@ -1,0 +1,61 @@
+<view class="page">
+  <view class="btn-primary create-btn" bindtap="openCreate">＋ 创建运动群</view>
+
+  <view class="join-card card">
+    <view class="join-title">加入已有群</view>
+    <view class="join-row">
+      <input
+        class="join-input"
+        placeholder="输入6位邀请码"
+        maxlength="6"
+        value="{{inviteCode}}"
+        bindinput="onInviteInput"
+      />
+      <button class="btn-primary join-btn" bindtap="doJoin">加入</button>
+    </view>
+  </view>
+
+  <view class="section-title group-section">我的群组</view>
+  <view wx:if="{{!loading && !myGroups.length}}" class="empty-tip">还没有加入任何群组</view>
+
+  <view
+    class="group-item card"
+    wx:for="{{myGroups}}"
+    wx:key="_id"
+    data-id="{{item._id}}"
+    bindtap="goDetail"
+  >
+    <view class="group-avatar">
+      <text>{{item.name[0]}}</text>
+    </view>
+    <view class="group-info">
+      <view class="group-name">{{item.name}}</view>
+      <view class="group-meta">
+        {{item.themeLabel}} · {{item.memberCount}}人
+        <text wx:if="{{item.role === 'owner'}}" class="owner-tag">{{item.roleLabel}}</text>
+        <text wx:else class="member-tag">{{item.roleLabel}}</text>
+      </view>
+    </view>
+    <text class="group-arrow">›</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showCreate}}" bindtap="closeCreate">
+    <view class="modal card" catchtap="">
+      <view class="modal-title">创建运动群</view>
+      <input class="modal-input" placeholder="群名称（必填）" maxlength="20" value="{{createName}}" bindinput="onNameInput" />
+      <input class="modal-input" placeholder="群简介（可选）" maxlength="100" value="{{createDesc}}" bindinput="onDescInput" />
+      <picker mode="selector" range="{{themes}}" range-key="label" value="{{themeIndex}}" bindchange="onThemeChange">
+        <view class="modal-picker">
+          <text>运动主题</text>
+          <text class="modal-picker-value">{{themes[themeIndex].label}}</text>
+        </view>
+      </picker>
+      <view class="modal-btns">
+        <button class="btn-ghost modal-btn" bindtap="closeCreate">取消</button>
+        <button class="btn-primary modal-btn" bindtap="doCreate">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-mask">加载中...</view>
+</view>

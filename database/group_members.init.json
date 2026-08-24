@@ -1,0 +1,34 @@
+{
+  "collection": "group_members",
+  "permission": "仅创建者可读写",
+  "permissionRule": "creator_openid == openid",
+  "indexes": [
+    {
+      "name": "groupId_openid_unique",
+      "fields": [
+        { "field": "groupId", "order": "asc" },
+        { "field": "openid", "order": "asc" }
+      ],
+      "unique": true
+    },
+    {
+      "name": "openid",
+      "fields": [
+        { "field": "openid", "order": "asc" }
+      ],
+      "unique": false
+    }
+  ],
+  "sampleDocs": [
+    {
+      "_id": "example",
+      "groupId": "example_group_id",
+      "openid": "oYOUR_OPENID_HERE",
+      "role": "owner",
+      "joinTime": { "$date": 1756041600000 },
+      "nickName": "运动达人",
+      "avatarUrl": "https://thirdwx.qlogo.cn/mmopen/example/132"
+    }
+  ],
+  "note": "权限选择「仅创建者可读写」。创建 (groupId, openid) 复合唯一索引，防止重复加入。"
+}

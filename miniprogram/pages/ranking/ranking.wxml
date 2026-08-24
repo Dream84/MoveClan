@@ -1,0 +1,82 @@
+<view class="page">
+  <picker wx:if="{{groups.length > 1}}" mode="selector" range="{{groups}}" range-key="name" value="{{groupIndex}}" bindchange="onGroupChange">
+    <view class="group-select">
+      <text class="group-select-name">{{currentGroup.name}}</text>
+      <text class="group-select-arrow">▾</text>
+    </view>
+  </picker>
+
+  <view class="tabs">
+    <view
+      class="tab {{period === 'week' ? 'active' : ''}}"
+      data-period="week"
+      bindtap="onPeriodChange"
+    >本周</view>
+    <view
+      class="tab {{period === 'month' ? 'active' : ''}}"
+      data-period="month"
+      bindtap="onPeriodChange"
+    >本月</view>
+  </view>
+
+  <view class="sorts">
+    <view
+      class="sort-chip {{sortBy === 'count' ? 'active' : ''}}"
+      data-sort="count"
+      bindtap="onSortChange"
+    >打卡次数</view>
+    <view
+      class="sort-chip {{sortBy === 'calories' ? 'active' : ''}}"
+      data-sort="calories"
+      bindtap="onSortChange"
+    >消耗卡路里</view>
+    <view
+      class="sort-chip {{sortBy === 'duration' ? 'active' : ''}}"
+      data-sort="duration"
+      bindtap="onSortChange"
+    >运动时长</view>
+  </view>
+
+  <view wx:if="{{!loading && !currentGroup}}" class="empty-tip">
+    加入运动群后即可查看排行榜
+    <view class="btn-ghost goto-btn" bindtap="goGroups">去群组</view>
+  </view>
+
+  <view wx:if="{{currentGroup}}" class="rank-list">
+    <view wx:if="{{!list.length}}" class="empty-tip">本周/本月暂无打卡数据</view>
+    <view
+      class="rank-item {{item.isMe ? 'me' : ''}}"
+      wx:for="{{list}}"
+      wx:key="openid"
+    >
+      <view class="rank-num">
+        <text wx:if="{{item.medal}}" class="medal">{{['', '🥇', '🥈', '🥉'][item.medal]}}</text>
+        <text wx:else>{{item.rank}}</text>
+      </view>
+      <view class="rank-avatar-wrap">
+        <image wx:if="{{item.avatarUrl}}" class="rank-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="rank-avatar avatar-fallback">{{item.nickName[0]}}</view>
+      </view>
+      <view class="rank-info">
+        <view class="rank-name">
+          {{item.nickName}}
+          <text wx:if="{{item.isMe}}" class="me-tag">我</text>
+        </view>
+        <view class="rank-sub">{{item.count}}次 · {{item.totalCalories}}千卡 · {{item.totalDuration}}分钟</view>
+      </view>
+      <view class="rank-value">
+        {{sortBy === 'count' ? item.count + ' 次' : sortBy === 'calories' ? item.totalCalories + ' 千卡' : item.totalDuration + ' 分钟'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="my-rank-bar" wx:if="{{currentGroup}}">
+    <text wx:if="{{myRank > 0}}">我的排名：第 {{myRank}} 名</text>
+    <text wx:else>我的排名：未上榜</text>
+    <text wx:if="{{myData}}" class="my-rank-value">
+      {{myData.count}}次 · {{myData.totalCalories}}千卡 · {{myData.totalDuration}}分钟
+    </text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-mask">加载中...</view>
+</view>

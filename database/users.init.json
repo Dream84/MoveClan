@@ -1,0 +1,27 @@
+{
+  "collection": "users",
+  "permission": "仅创建者可读写",
+  "permissionRule": "creator_openid == openid",
+  "indexes": [
+    {
+      "name": "openid_unique",
+      "fields": [
+        { "field": "openid", "order": "asc" }
+      ],
+      "unique": true
+    }
+  ],
+  "sampleDocs": [
+    {
+      "_id": "example",
+      "openid": "oYOUR_OPENID_HERE",
+      "nickName": "运动达人",
+      "avatarUrl": "https://thirdwx.qlogo.cn/mmopen/example/132",
+      "joinTime": { "$date": 1756041600000 },
+      "defaultGroupId": "",
+      "maxStreakDays": 0,
+      "achievedMilestones": []
+    }
+  ],
+  "note": "使用云开发控制台创建集合 users，权限选择「仅创建者可读写」；随后在「索引管理」创建 openid 唯一索引。导入 sampleDocs 时需移除 _id 示例或替换为实际值。"
+}

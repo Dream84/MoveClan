@@ -1,0 +1,9 @@
+{
+  "name": "updateCheckin",
+  "version": "1.0.0",
+  "description": "编辑打卡记录（含内容安全审核）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

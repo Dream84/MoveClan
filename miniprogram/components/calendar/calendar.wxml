@@ -1,0 +1,39 @@
+<view class="calendar card">
+  <view class="cal-head">
+    <view class="cal-nav" bindtap="prev">‹</view>
+    <view class="cal-title">{{title}}</view>
+    <view class="cal-nav" bindtap="next">›</view>
+  </view>
+
+  <view class="cal-week">
+    <view class="cal-week-item">一</view>
+    <view class="cal-week-item">二</view>
+    <view class="cal-week-item">三</view>
+    <view class="cal-week-item">四</view>
+    <view class="cal-week-item">五</view>
+    <view class="cal-week-item">六</view>
+    <view class="cal-week-item">日</view>
+  </view>
+
+  <view class="cal-grid">
+    <view class="cal-row" wx:for="{{weeks}}" wx:key="index" wx:for-item="week">
+      <view class="cal-cell" wx:for="{{week}}" wx:key="index" wx:for-item="cell">
+        <view wx:if="{{cell}}" class="cal-day level-{{cell.level}} {{cell.isToday ? 'today' : ''}}">
+          {{cell.day}}
+        </view>
+        <view wx:else class="cal-day blank"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cal-legend">
+    <text class="legend-dot l0"></text>
+    <text class="legend-text">无</text>
+    <text class="legend-dot l1"></text>
+    <text class="legend-text">1次</text>
+    <text class="legend-dot l2"></text>
+    <text class="legend-text">2次</text>
+    <text class="legend-dot l3"></text>
+    <text class="legend-text">3次+</text>
+  </view>
+</view>

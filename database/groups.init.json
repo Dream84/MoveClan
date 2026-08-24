@@ -1,0 +1,35 @@
+{
+  "collection": "groups",
+  "permission": "所有用户可读",
+  "permissionRule": "true",
+  "indexes": [
+    {
+      "name": "inviteCode_unique",
+      "fields": [
+        { "field": "inviteCode", "order": "asc" }
+      ],
+      "unique": true
+    },
+    {
+      "name": "status",
+      "fields": [
+        { "field": "status", "order": "asc" }
+      ],
+      "unique": false
+    }
+  ],
+  "sampleDocs": [
+    {
+      "_id": "example",
+      "name": "早起跑步打卡群",
+      "description": "每天 7 点前跑步 3 公里",
+      "sportTheme": "running",
+      "inviteCode": "A1B2C3",
+      "ownerOpenid": "oYOUR_OPENID_HERE",
+      "memberCount": 1,
+      "createTime": { "$date": 1756041600000 },
+      "status": "active"
+    }
+  ],
+  "note": "权限选择「所有用户可读」，写操作全部走云函数。创建 inviteCode 唯一索引（云函数生成时依赖唯一性重试）。"
+}

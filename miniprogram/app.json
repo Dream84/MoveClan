@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/ranking/ranking",
+    "pages/groups/groups",
+    "pages/profile/profile",
+    "pages/group-detail/group-detail",
+    "pages/checkin-edit/checkin-edit"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FF7A45",
+    "navigationBarTitleText": "跃动圈",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FFF7F0",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#9AA0A6",
+    "selectedColor": "#FF7A45",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "打卡"
+      },
+      {
+        "pagePath": "pages/ranking/ranking",
+        "text": "排行"
+      },
+      {
+        "pagePath": "pages/groups/groups",
+        "text": "群组"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

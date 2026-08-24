@@ -1,0 +1,40 @@
+{
+  "collection": "checkins",
+  "permission": "仅创建者可读写",
+  "permissionRule": "creator_openid == openid",
+  "indexes": [
+    {
+      "name": "groupId_checkDate",
+      "fields": [
+        { "field": "groupId", "order": "asc" },
+        { "field": "checkDate", "order": "asc" }
+      ],
+      "unique": false
+    },
+    {
+      "name": "openid_checkDate",
+      "fields": [
+        { "field": "openid", "order": "asc" },
+        { "field": "checkDate", "order": "asc" }
+      ],
+      "unique": false
+    }
+  ],
+  "sampleDocs": [
+    {
+      "_id": "example",
+      "groupId": "example_group_id",
+      "openid": "oYOUR_OPENID_HERE",
+      "checkDate": "2026-08-24",
+      "sportType": "running",
+      "duration": 30,
+      "calories": 300,
+      "count": 1,
+      "imageFileId": "cloud://env-id.656e-env-id-1300000000/checkins/xxx.jpg",
+      "remark": "晨跑 5 公里，状态不错",
+      "createTime": { "$date": 1756041600000 },
+      "updateTime": { "$date": 1756041600000 }
+    }
+  ],
+  "note": "权限选择「仅创建者可读写」，排行榜/统计聚合全部走云函数。创建两个复合索引：排行榜聚合用 (groupId, checkDate)，个人统计用 (openid, checkDate)。"
+}
