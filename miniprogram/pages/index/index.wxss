@@ -139,6 +139,12 @@
   color: var(--primary);
 }
 
+.week-sk {
+  width: 96rpx;
+  height: 48rpx;
+  margin: 0 auto;
+}
+
 .week-label {
   font-size: 24rpx;
   color: var(--text-sub);
@@ -169,6 +175,13 @@
   align-items: center;
   justify-content: center;
   font-size: 40rpx;
+}
+
+.recent-sk-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 24rpx;
+  flex-shrink: 0;
 }
 
 .recent-info {

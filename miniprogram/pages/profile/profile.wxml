@@ -6,13 +6,27 @@
     </view>
     <view class="profile-text">
       <view class="profile-name">{{userInfo.nickName || '微信用户'}}</view>
-      <view class="profile-sub">累计打卡 {{stats.totalCount}} 次</view>
+      <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg · 累计打卡 {{stats.totalCount}} 次</view>
     </view>
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
 
   <view class="stats-card card">
-    <view class="stats-grid">
+    <view class="stats-grid" wx:if="{{!statsLoaded}}">
+      <view class="stats-item">
+        <view class="sk-block stats-sk"></view>
+        <view class="stats-label">总打卡次数</view>
+      </view>
+      <view class="stats-item">
+        <view class="sk-block stats-sk"></view>
+        <view class="stats-label">总卡路里</view>
+      </view>
+      <view class="stats-item">
+        <view class="sk-block stats-sk"></view>
+        <view class="stats-label">最高连续天数</view>
+      </view>
+    </view>
+    <view class="stats-grid" wx:else>
       <view class="stats-item">
         <view class="stats-num">{{stats.totalCount}}</view>
         <view class="stats-label">总打卡次数</view>
@@ -61,6 +75,7 @@
         <view class="choose-tip">点击更换头像</view>
       </button>
       <input class="modal-input" type="nickname" placeholder="请输入昵称" maxlength="30" value="{{editNickName}}" bindinput="onNickInput" />
+      <input class="modal-input" type="digit" placeholder="体重（公斤），用于估算卡路里" maxlength="5" value="{{editWeight}}" bindinput="onWeightInput" />
       <view class="modal-btns">
         <button class="btn-ghost modal-btn" bindtap="closeEdit">取消</button>
         <button class="btn-primary modal-btn" bindtap="saveProfile">保存</button>

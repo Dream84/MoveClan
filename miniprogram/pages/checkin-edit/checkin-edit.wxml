@@ -31,10 +31,14 @@
       <text class="form-label">消耗卡路里（千卡）</text>
       <view class="form-input-wrap">
         <input class="form-input" type="number" placeholder="如 300" value="{{calories}}" bindinput="onCaloriesInput" />
+        <text class="estimate-question" bindtap="toggleFormula">?</text>
         <text class="estimate-btn" bindtap="estimateCalories">估算</text>
       </view>
     </view>
-    <view class="hint" wx:if="{{estimateHint}}">{{estimateHint}}</view>
+    <view class="hint" wx:if="{{showFormula}}">
+      <view class="hint-line">消耗(千卡) = MET × 体重(kg) × 时长(h)</view>
+      <view class="hint-sub" wx:if="{{estimateHint}}">{{estimateHint}} · 未填体重默认按 50kg 估算</view>
+    </view>
 
     <view class="form-row">
       <text class="form-label">打卡次数</text>

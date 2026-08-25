@@ -24,15 +24,21 @@ Page({
     this.loadDetail()
   },
 
-  async loadDetail() {
+  onPullDownRefresh() {
+    this.loadDetail(true).finally(() => wx.stopPullDownRefresh())
+  },
+
+  async loadDetail(pull) {
     const { groupId } = this.data
     if (!groupId) return
     try {
       if (!app.globalData.userInfo) {
         await app.login()
       }
-      const info = await api.call('getGroupInfo', { groupId })
-      const membersRes = await api.call('getGroupMembers', { groupId })
+      const [info, membersRes] = await Promise.all([
+        api.call('getGroupInfo', { groupId }),
+        api.call('getGroupMembers', { groupId, refresh: !!pull })
+      ])
       const members = (membersRes.members || []).map(m => ({
         ...m,
         isOwner: m.role === 'owner',

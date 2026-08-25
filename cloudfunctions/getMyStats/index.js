@@ -1,7 +1,10 @@
 const cloud = require('wx-server-sdk')
+const cache = require('cache')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
+
+const cacheStore = new cache(60 * 1000)
 
 const ACHIEVEMENT_DAYS = [7, 14, 30]
 
@@ -92,6 +95,12 @@ exports.main = async (event) => {
   const groupId = event.groupId || ''
   const range = todayCN()
 
+  const cacheKey = `stats:${OPENID}:${groupId || 'all'}`
+  const cached = cacheStore.get(cacheKey)
+  if (cached && event.refresh !== true) {
+    return { code: 0, message: 'ok', data: cached }
+  }
+
   try {
     const statsField = { groupId: true, openid: true, checkDate: true, duration: true, calories: true, count: true }
 
@@ -152,22 +161,20 @@ exports.main = async (event) => {
       })
     }
 
-    return {
-      code: 0,
-      message: 'ok',
-      data: {
-        weekCount,
-        weekCalories: Math.round(weekCalories),
-        monthCount,
-        monthCalories: Math.round(monthCalories),
-        totalCount,
-        streakDays: streakInfo.streak,
-        maxStreakDays: Math.max(prevMax, streakInfo.streak),
-        monthDays,
-        newMilestones,
-        today: range.today
-      }
+    const data = {
+      weekCount,
+      weekCalories: Math.round(weekCalories),
+      monthCount,
+      monthCalories: Math.round(monthCalories),
+      totalCount,
+      streakDays: streakInfo.streak,
+      maxStreakDays: Math.max(prevMax, streakInfo.streak),
+      monthDays,
+      newMilestones,
+      today: range.today
     }
+    cacheStore.put(cacheKey, data)
+    return { code: 0, message: 'ok', data }
   } catch (err) {
     console.error('[getMyStats]', err)
     return { code: 500, message: '获取统计数据失败，请重试' }

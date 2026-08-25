@@ -34,7 +34,7 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.refresh().finally(() => wx.stopPullDownRefresh())
+    this.refresh(true).finally(() => wx.stopPullDownRefresh())
   },
 
   onReachBottom() {
@@ -43,7 +43,7 @@ Page({
     }
   },
 
-  async refresh() {
+  async refresh(pull) {
     try {
       if (!app.globalData.userInfo) {
         await app.login()
@@ -52,8 +52,8 @@ Page({
         userInfo: app.globalData.userInfo,
         greeting: greeting()
       })
-      await this.loadGroups()
-      await Promise.all([this.loadWeekStats(), this.loadRecent(true)])
+      await this.loadGroups(!!pull)
+      await Promise.all([this.loadWeekStats(!!pull), this.loadRecent(true)])
     } catch (err) {
       console.error('[index.refresh]', err)
     } finally {
@@ -61,19 +61,19 @@ Page({
     }
   },
 
-  async loadGroups() {
-    const groups = await app.getMyGroups()
+  async loadGroups(force) {
+    const groups = await app.getMyGroups(force)
     const currentGroup = groups[0] || null
     this.setData({ groups, currentGroup, groupIndex: 0 })
   },
 
-  async loadWeekStats() {
+  async loadWeekStats(force) {
     const group = this.data.currentGroup
     if (!group) {
       this.setData({ weekStats: { weekCount: 0, weekCalories: 0, streakDays: 0 } })
       return
     }
-    const stats = await api.call('getMyStats', { groupId: group._id }, { loading: false })
+    const stats = await api.call('getMyStats', { groupId: group._id, refresh: !!force }, { loading: false })
     this.setData({
       weekStats: {
         weekCount: stats.weekCount,

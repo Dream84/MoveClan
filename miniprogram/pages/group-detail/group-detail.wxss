@@ -146,6 +146,12 @@
   display: block;
 }
 
+.member-avatar-sk {
+  width: 76rpx;
+  height: 76rpx;
+  flex-shrink: 0;
+}
+
 .member-info {
   flex: 1;
   margin-left: 20rpx;

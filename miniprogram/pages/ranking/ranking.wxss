@@ -94,6 +94,20 @@
   color: var(--text-sub);
 }
 
+.rank-num-sk {
+  width: 48rpx;
+  height: 32rpx;
+  margin: 0 12rpx 0 0;
+  flex-shrink: 0;
+}
+
+.rank-avatar-sk {
+  width: 84rpx;
+  height: 84rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
 .rank-num .medal {
   font-size: 40rpx;
 }

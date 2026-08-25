@@ -1,7 +1,10 @@
 const cloud = require('wx-server-sdk')
+const cache = require('cache')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
+
+const cacheStore = new cache(60 * 1000)
 
 function withThumb(url) {
   if (!url) return ''
@@ -52,6 +55,12 @@ exports.main = async (event) => {
       return { code: 2, message: '群不存在或已解散' }
     }
 
+    const cacheKey = `members:${groupId}`
+    const cached = cacheStore.get(cacheKey)
+    if (cached && event.refresh !== true) {
+      return { code: 0, message: 'ok', data: cached }
+    }
+
     const res = await db.collection('group_members').where({ groupId }).limit(1000).get()
     const members = res.data
 
@@ -73,8 +82,10 @@ exports.main = async (event) => {
       return a.role === 'owner' ? -1 : 1
     })
     const withAvatars = await resolveAvatarUrls(merged)
+    const data = { members: withAvatars }
+    cacheStore.put(cacheKey, data)
 
-    return { code: 0, message: 'ok', data: { members: withAvatars } }
+    return { code: 0, message: 'ok', data }
   } catch (err) {
     console.error('[getGroupMembers]', err)
     return { code: 500, message: '获取成员列表失败' }

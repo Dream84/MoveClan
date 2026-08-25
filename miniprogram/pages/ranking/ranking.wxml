@@ -43,7 +43,15 @@
   </view>
 
   <view wx:if="{{currentGroup}}" class="rank-list">
-    <view wx:if="{{!list.length}}" class="empty-tip">本周/本月暂无打卡数据</view>
+    <view wx:if="{{loading}}" class="rank-item" wx:for="{{[1, 2, 3, 4, 5]}}" wx:key="*this">
+      <view class="sk-block rank-num-sk"></view>
+      <view class="sk-circle rank-avatar-sk"></view>
+      <view class="rank-info">
+        <view class="sk-block sk-line"></view>
+        <view class="sk-block sk-line-short"></view>
+      </view>
+    </view>
+    <view wx:elif="{{!list.length}}" class="empty-tip">本周/本月暂无打卡数据</view>
     <view
       class="rank-item {{item.isMe ? 'me' : ''}}"
       wx:for="{{list}}"
@@ -77,6 +85,4 @@
       {{myData.count}}次 · {{myData.totalCalories}}千卡 · {{myData.totalDuration}}分钟
     </text>
   </view>
-
-  <view wx:if="{{loading}}" class="loading-mask">加载中...</view>
 </view>

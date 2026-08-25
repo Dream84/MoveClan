@@ -58,11 +58,32 @@
   margin-left: 12rpx;
 }
 
+.estimate-question {
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  background: var(--primary-light);
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+
 .hint {
   text-align: right;
   font-size: 22rpx;
   color: var(--text-light);
   margin-top: 8rpx;
+}
+
+.hint-line {
+  color: var(--text-sub);
+}
+
+.hint-sub {
+  margin-top: 4rpx;
 }
 
 .stepper {

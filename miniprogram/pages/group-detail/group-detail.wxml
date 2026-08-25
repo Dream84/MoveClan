@@ -18,6 +18,12 @@
 
   <view class="section-title">成员列表（{{members.length}}）</view>
   <view class="member-card card">
+    <view class="member-item" wx:if="{{loading}}" wx:for="{{[1, 2, 3]}}" wx:key="*this">
+      <view class="sk-circle member-avatar-sk"></view>
+      <view class="member-info">
+        <view class="sk-block sk-line"></view>
+      </view>
+    </view>
     <view
       class="member-item"
       wx:for="{{members}}"

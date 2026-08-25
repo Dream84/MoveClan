@@ -18,6 +18,8 @@ exports.main = async (event) => {
   }
   const nickName = (event.nickName || '').toString().slice(0, 30)
   const avatarUrl = (event.avatarUrl || '').toString()
+  const rawWeight = Number(event.weightKg)
+  const hasWeight = event.weightKg !== undefined && event.weightKg !== '' && rawWeight >= 20 && rawWeight <= 300
 
   try {
     const users = db.collection('users')
@@ -32,6 +34,7 @@ exports.main = async (event) => {
           openid: OPENID,
           nickName: effectiveNick,
           avatarUrl: effectiveAvatar,
+          weightKg: hasWeight ? rawWeight : 50,
           joinTime: db.serverDate(),
           defaultGroupId: '',
           maxStreakDays: 0,
@@ -47,6 +50,7 @@ exports.main = async (event) => {
           openid: OPENID,
           nickName: effectiveNick,
           avatarUrl: effectiveAvatar,
+          weightKg: hasWeight ? rawWeight : 50,
           isNew: true
         }
       }
@@ -56,6 +60,8 @@ exports.main = async (event) => {
     const updateData = {}
     if (nickName && nickName !== u.nickName) updateData.nickName = nickName
     if (avatarUrl && avatarUrl !== u.avatarUrl) updateData.avatarUrl = avatarUrl
+    if (hasWeight && rawWeight !== u.weightKg) updateData.weightKg = rawWeight
+    if (!hasWeight && !(u.weightKg >= 20 && u.weightKg <= 300)) updateData.weightKg = 50
     const finalUser = Object.assign({}, u, updateData)
     if (Object.keys(updateData).length) {
       await users.doc(u._id).update({ data: updateData })

@@ -18,6 +18,7 @@
       "openid": "oYOUR_OPENID_HERE",
       "nickName": "运动达人",
       "avatarUrl": "https://thirdwx.qlogo.cn/mmopen/example/132",
+      "weightKg": 65,
       "joinTime": { "$date": 1756041600000 },
       "defaultGroupId": "",
       "maxStreakDays": 0,

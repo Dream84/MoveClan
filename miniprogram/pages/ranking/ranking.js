@@ -24,7 +24,7 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.loadRanking().finally(() => wx.stopPullDownRefresh())
+    this.loadRanking(true).finally(() => wx.stopPullDownRefresh())
   },
 
   async init() {
@@ -47,7 +47,7 @@ Page({
     this.setData({ groups, currentGroup: groups[0] || null, groupIndex: 0 })
   },
 
-  async loadRanking() {
+  async loadRanking(pull) {
     const group = this.data.currentGroup
     if (!group) {
       this.setData({ list: [], myRank: 0, myData: null })
@@ -56,7 +56,8 @@ Page({
     const data = await api.call('getGroupRanking', {
       groupId: group._id,
       period: this.data.period,
-      sortBy: this.data.sortBy
+      sortBy: this.data.sortBy,
+      refresh: !!pull
     }, { loading: false })
     const myOpenid = this.data.myOpenid
     const list = (data.list || []).map(item => ({

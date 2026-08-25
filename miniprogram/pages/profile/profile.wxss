@@ -81,6 +81,12 @@
   color: var(--primary);
 }
 
+.stats-sk {
+  width: 96rpx;
+  height: 44rpx;
+  margin: 0 auto;
+}
+
 .stats-label {
   font-size: 24rpx;
   color: var(--text-sub);

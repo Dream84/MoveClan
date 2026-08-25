@@ -4,6 +4,10 @@ const constants = require('../../utils/constants')
 
 const app = getApp()
 
+function buildHint(sport) {
+  return `${sport.label}（MET ${constants.sportMet(sport.value)}）`
+}
+
 Page({
   data: {
     id: '',
@@ -17,6 +21,7 @@ Page({
     sportTypes: constants.SPORT_TYPES,
     sportIndex: 0,
     estimateHint: '',
+    showFormula: false,
     duration: '',
     calories: '',
     count: 1,
@@ -77,7 +82,7 @@ Page({
         groups,
         groupIndex,
         groupLabel: groups[groupIndex] ? groups[groupIndex].name : '',
-        estimateHint: `${sport.label}每分钟约${constants.CALORIES_PER_MIN[sport.value]}千卡`
+        estimateHint: buildHint(sport)
       })
       if (!groups.length) {
         wx.showToast({ title: '请先加入运动群', icon: 'none' })
@@ -115,7 +120,7 @@ Page({
       groupLabel: group ? group.name : '',
       checkDate: r.checkDate,
       sportIndex,
-      estimateHint: `${sport.label}每分钟约${constants.CALORIES_PER_MIN[sport.value]}千卡`,
+      estimateHint: buildHint(sport),
       duration: String(r.duration),
       calories: String(r.calories),
       count: r.count || 1,
@@ -143,7 +148,7 @@ Page({
     const sport = constants.SPORT_TYPES[sportIndex]
     this.setData({
       sportIndex,
-      estimateHint: `${sport.label}每分钟约${constants.CALORIES_PER_MIN[sport.value]}千卡`
+      estimateHint: buildHint(sport)
     })
   },
 
@@ -155,16 +160,22 @@ Page({
     this.setData({ calories: e.detail.value })
   },
 
+  toggleFormula() {
+    this.setData({ showFormula: !this.data.showFormula })
+  },
+
   estimateCalories() {
     const duration = Number(this.data.duration)
     if (!(duration > 0)) {
       wx.showToast({ title: '先填写运动时长', icon: 'none' })
       return
     }
+    const weight = Number(app.globalData.userInfo && app.globalData.userInfo.weightKg) || 50
     const sport = constants.SPORT_TYPES[this.data.sportIndex]
-    const cal = Math.round(duration * constants.CALORIES_PER_MIN[sport.value])
+    const met = constants.sportMet(sport.value)
+    const cal = Math.round(met * weight * (duration / 60))
     this.setData({ calories: String(cal) })
-    wx.showToast({ title: `估算约 ${cal} 千卡`, icon: 'none' })
+    wx.showToast({ title: `估算约 ${cal} 千卡（按 ${weight}kg）`, icon: 'none' })
   },
 
   onCountMinus() {
@@ -284,7 +295,7 @@ Page({
 
       let newMilestones = []
       try {
-        const stats = await api.call('getMyStats', {}, { loading: false })
+        const stats = await api.call('getMyStats', { refresh: true }, { loading: false })
         newMilestones = stats.newMilestones || []
       } catch (e) {
         console.error('[achievement check]', e)

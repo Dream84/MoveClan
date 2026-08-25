@@ -19,11 +19,13 @@ Page({
     calYear: 0,
     calMonth: 0,
     calValue: [],
+    statsLoaded: false,
     subscribeEnabled: false,
     showEdit: false,
     editAvatarUrl: '',
     editAvatarTemp: '',
-    editNickName: ''
+    editNickName: '',
+    editWeight: ''
   },
 
   onShow() {
@@ -31,10 +33,10 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.refresh().finally(() => wx.stopPullDownRefresh())
+    this.refresh(true).finally(() => wx.stopPullDownRefresh())
   },
 
-  async refresh() {
+  async refresh(pull) {
     try {
       if (!app.globalData.userInfo) {
         await app.login()
@@ -43,15 +45,16 @@ Page({
         userInfo: app.globalData.userInfo,
         subscribeEnabled: wx.getStorageSync('subscribeEnabled') || false
       })
-      await this.loadStats()
+      await this.loadStats(!!pull)
     } catch (err) {
       console.error('[profile.refresh]', err)
     }
   },
 
-  async loadStats() {
-    const stats = await api.call('getMyStats', {}, { loading: false })
-    this.setData({ stats })
+  async loadStats(pull) {
+    this.setData({ statsLoaded: false })
+    const stats = await api.call('getMyStats', { refresh: !!pull }, { loading: false })
+    this.setData({ stats, statsLoaded: true })
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth() + 1
@@ -85,11 +88,13 @@ Page({
 
   openEdit() {
     const u = this.data.userInfo
+    const weight = Number(u && u.weightKg)
     this.setData({
       showEdit: true,
       editAvatarUrl: (u && u.avatarUrl) || '',
       editAvatarTemp: '',
-      editNickName: (u && u.nickName) || ''
+      editNickName: (u && u.nickName) || '',
+      editWeight: weight >= 20 && weight <= 300 ? String(weight) : '50'
     })
   },
 
@@ -107,10 +112,19 @@ Page({
     this.setData({ editNickName: e.detail.value })
   },
 
+  onWeightInput(e) {
+    this.setData({ editWeight: e.detail.value })
+  },
+
   async saveProfile() {
     const nickName = this.data.editNickName.trim()
     if (!nickName) {
       wx.showToast({ title: '请输入昵称', icon: 'none' })
+      return
+    }
+    const weightKg = Number(this.data.editWeight)
+    if (this.data.editWeight && !(weightKg >= 20 && weightKg <= 300)) {
+      wx.showToast({ title: '体重须为 20-300 公斤', icon: 'none' })
       return
     }
     wx.showLoading({ title: '保存中...', mask: true })
@@ -121,7 +135,11 @@ Page({
         const res = await api.uploadImage(this.data.editAvatarTemp, 'profile', null)
         avatarUrl = res.fileID
       }
-      const user = await api.call('login', { nickName, avatarUrl }, { loading: false })
+      const user = await api.call('login', {
+        nickName,
+        avatarUrl,
+        weightKg: weightKg > 0 ? weightKg : 0
+      }, { loading: false })
       app.setUserInfo(user)
       this.setData({
         userInfo: user,

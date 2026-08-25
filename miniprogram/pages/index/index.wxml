@@ -39,7 +39,21 @@
 
       <view class="week-card card">
         <view class="section-title">本周概览</view>
-        <view class="week-row">
+        <view class="week-row" wx:if="{{loading}}">
+          <view class="week-item">
+            <view class="sk-block week-sk"></view>
+            <view class="week-label">打卡次数</view>
+          </view>
+          <view class="week-item">
+            <view class="sk-block week-sk"></view>
+            <view class="week-label">千卡</view>
+          </view>
+          <view class="week-item">
+            <view class="sk-block week-sk"></view>
+            <view class="week-label">连续天数</view>
+          </view>
+        </view>
+        <view class="week-row" wx:else>
           <view class="week-item">
             <view class="week-num">{{weekStats.weekCount}}</view>
             <view class="week-label">打卡次数</view>
@@ -57,29 +71,38 @@
 
       <view class="recent-card card">
         <view class="section-title">最近打卡</view>
-        <view wx:if="{{!recentCheckins.length}}" class="empty-tip">还没有打卡记录，快去打第一卡吧</view>
-        <view class="recent-item" wx:for="{{recentCheckins}}" wx:key="_id" data-id="{{item._id}}" bindtap="editCheckin">
-          <view class="recent-icon">🏃</view>
-          <view class="recent-info">
-            <view class="recent-title">
-              {{item.sportLabel}}
-              <text class="recent-count" wx:if="{{item.count > 1}}">x{{item.count}}</text>
+        <block wx:if="{{recentLoading && !recentCheckins.length}}">
+          <view class="recent-item" wx:for="{{[1, 2, 3]}}" wx:key="*this">
+            <view class="sk-circle recent-sk-icon"></view>
+            <view class="recent-info">
+              <view class="sk-block sk-line"></view>
+              <view class="sk-block sk-line-short"></view>
             </view>
-            <view class="recent-meta">{{item.checkDate}}</view>
           </view>
-          <view class="recent-stats">
-            <text class="recent-dur">{{item.duration}}分钟</text>
-            <text class="recent-cal">{{item.calories}}千卡</text>
+        </block>
+        <view wx:elif="{{!recentLoading && !recentCheckins.length}}" class="empty-tip">还没有打卡记录，快去打第一卡吧</view>
+        <block wx:else>
+          <view class="recent-item" wx:for="{{recentCheckins}}" wx:key="_id" data-id="{{item._id}}" bindtap="editCheckin">
+            <view class="recent-icon">🏃</view>
+            <view class="recent-info">
+              <view class="recent-title">
+                {{item.sportLabel}}
+                <text class="recent-count" wx:if="{{item.count > 1}}">x{{item.count}}</text>
+              </view>
+              <view class="recent-meta">{{item.checkDate}}</view>
+            </view>
+            <view class="recent-stats">
+              <text class="recent-dur">{{item.duration}}分钟</text>
+              <text class="recent-cal">{{item.calories}}千卡</text>
+            </view>
           </view>
-        </view>
+        </block>
         <view class="recent-footer">
-          <text wx:if="{{recentLoading}}">加载中...</text>
+          <text wx:if="{{recentLoading && recentCheckins.length}}">加载中...</text>
           <text wx:elif="{{recentHasMore}}">上拉加载更多</text>
           <text wx:elif="{{recentCheckins.length > 0}}">没有更多了</text>
         </view>
       </view>
     </block>
   </view>
-
-  <view wx:if="{{loading}}" class="loading-mask">加载中...</view>
 </view>

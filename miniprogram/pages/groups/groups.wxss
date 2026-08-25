@@ -64,6 +64,13 @@
   flex-shrink: 0;
 }
 
+.group-avatar-sk {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 28rpx;
+  flex-shrink: 0;
+}
+
 .group-info {
   flex: 1;
   margin-left: 24rpx;

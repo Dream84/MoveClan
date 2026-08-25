@@ -95,7 +95,7 @@ exports.main = async (event) => {
 
     const cacheKey = `rank:${groupId}:${period}:${sortBy}`
     const cached = cacheStore.get(cacheKey)
-    if (cached) {
+    if (cached && event.refresh !== true) {
       return { code: 0, message: 'ok', data: cached }
     }
 
