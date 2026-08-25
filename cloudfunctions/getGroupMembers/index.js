@@ -3,6 +3,35 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 
+function withThumb(url) {
+  if (!url) return ''
+  const qIdx = url.indexOf('?')
+  if (qIdx >= 0) {
+    return url.slice(0, qIdx) + '?imageMogr2/thumbnail/200x' + '&' + url.slice(qIdx + 1)
+  }
+  return url + '?imageMogr2/thumbnail/200x'
+}
+
+async function resolveAvatarUrls(rows) {
+  const fileIds = rows.map(r => r.avatarUrl).filter(id => id && id.indexOf('cloud://') === 0)
+  const urlMap = {}
+  for (let i = 0; i < fileIds.length; i += 50) {
+    const chunk = fileIds.slice(i, i + 50)
+    try {
+      const res = await cloud.getTempFileURL({ fileList: chunk })
+      ;(res.fileList || []).forEach(item => {
+        if (item.tempFileURL) urlMap[item.fileID] = item.tempFileURL
+      })
+    } catch (err) {
+      console.error('[getTempFileURL]', err)
+    }
+  }
+  return rows.map(r => ({
+    ...r,
+    avatarUrl: withThumb(urlMap[r.avatarUrl] || r.avatarUrl || '')
+  }))
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
@@ -43,8 +72,9 @@ exports.main = async (event) => {
       if (a.role === b.role) return 0
       return a.role === 'owner' ? -1 : 1
     })
+    const withAvatars = await resolveAvatarUrls(merged)
 
-    return { code: 0, message: 'ok', data: { members: merged } }
+    return { code: 0, message: 'ok', data: { members: withAvatars } }
   } catch (err) {
     console.error('[getGroupMembers]', err)
     return { code: 500, message: '获取成员列表失败' }

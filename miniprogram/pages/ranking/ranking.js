@@ -43,20 +43,7 @@ Page({
   },
 
   async loadGroups() {
-    const db = wx.cloud.database()
-    const _ = db.command
-    const me = app.globalData.openid
-    const memRes = await db.collection('group_members').where({ openid: me }).get()
-    const mems = memRes.data || []
-    if (!mems.length) {
-      this.setData({ groups: [], currentGroup: null, list: [], myRank: 0 })
-      return
-    }
-    const ids = mems.map(m => m.groupId)
-    const groupRes = await db.collection('groups')
-      .where({ _id: _.in(ids), status: 'active' })
-      .get()
-    const groups = groupRes.data || []
+    const groups = await app.getMyGroups()
     this.setData({ groups, currentGroup: groups[0] || null, groupIndex: 0 })
   },
 

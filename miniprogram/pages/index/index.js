@@ -3,6 +3,8 @@ const constants = require('../../utils/constants')
 
 const app = getApp()
 
+const RECENT_PAGE_SIZE = 5
+
 function greeting() {
   const h = new Date().getHours()
   if (h < 6) return '夜深了'
@@ -22,6 +24,8 @@ Page({
     currentGroup: null,
     weekStats: { weekCount: 0, weekCalories: 0, streakDays: 0 },
     recentCheckins: [],
+    recentPage: 0,
+    recentHasMore: false,
     loading: true
   },
 
@@ -31,6 +35,12 @@ Page({
 
   onPullDownRefresh() {
     this.refresh().finally(() => wx.stopPullDownRefresh())
+  },
+
+  onReachBottom() {
+    if (this.data.recentHasMore && !this.data.recentLoading) {
+      this.loadRecent(false)
+    }
   },
 
   async refresh() {
@@ -43,8 +53,7 @@ Page({
         greeting: greeting()
       })
       await this.loadGroups()
-      await this.loadWeekStats()
-      await this.loadRecent()
+      await Promise.all([this.loadWeekStats(), this.loadRecent(true)])
     } catch (err) {
       console.error('[index.refresh]', err)
     } finally {
@@ -53,20 +62,7 @@ Page({
   },
 
   async loadGroups() {
-    const db = wx.cloud.database()
-    const _ = db.command
-    const me = app.globalData.openid
-    const memRes = await db.collection('group_members').where({ openid: me }).get()
-    const mems = memRes.data || []
-    if (!mems.length) {
-      this.setData({ groups: [], currentGroup: null, groupIndex: 0, recentCheckins: [] })
-      return
-    }
-    const ids = mems.map(m => m.groupId)
-    const groupRes = await db.collection('groups')
-      .where({ _id: _.in(ids), status: 'active' })
-      .get()
-    const groups = groupRes.data || []
+    const groups = await app.getMyGroups()
     const currentGroup = groups[0] || null
     this.setData({ groups, currentGroup, groupIndex: 0 })
   },
@@ -87,31 +83,45 @@ Page({
     })
   },
 
-  async loadRecent() {
+  async loadRecent(reset) {
     const group = this.data.currentGroup
     if (!group) {
-      this.setData({ recentCheckins: [] })
+      this.setData({ recentCheckins: [], recentHasMore: false })
       return
     }
-    const db = wx.cloud.database()
-    const res = await db.collection('checkins')
-      .where({ openid: app.globalData.openid })
-      .orderBy('checkDate', 'desc')
-      .limit(20)
-      .get()
-    const recent = (res.data || [])
-      .filter(c => c.groupId === group._id)
-      .slice(0, 5)
-      .map(c => ({
-        _id: c._id,
-        sportLabel: constants.sportLabel(c.sportType),
-        duration: c.duration,
-        calories: c.calories,
-        checkDate: c.checkDate,
-        count: c.count,
-        hasImage: !!c.imageFileId
-      }))
-    this.setData({ recentCheckins: recent })
+    const page = reset ? 0 : this.data.recentPage
+    if (this.data.recentLoading) return
+    this.setData({ recentLoading: true })
+    try {
+      const db = wx.cloud.database()
+      const res = await db.collection('checkins')
+        .where({ openid: app.globalData.openid })
+        .orderBy('checkDate', 'desc')
+        .skip(page * RECENT_PAGE_SIZE)
+        .limit(RECENT_PAGE_SIZE)
+        .get()
+      const raw = res.data || []
+      const rows = raw
+        .filter(c => c.groupId === group._id)
+        .map(c => ({
+          _id: c._id,
+          sportLabel: constants.sportLabel(c.sportType),
+          duration: c.duration,
+          calories: c.calories,
+          checkDate: c.checkDate,
+          count: c.count,
+          hasImage: !!c.imageFileId
+        }))
+      this.setData({
+        recentCheckins: reset ? rows : this.data.recentCheckins.concat(rows),
+        recentPage: page + 1,
+        recentHasMore: raw.length === RECENT_PAGE_SIZE
+      })
+    } catch (err) {
+      console.error('[index.loadRecent]', err)
+    } finally {
+      this.setData({ recentLoading: false })
+    }
   },
 
   onGroupChange(e) {
@@ -120,7 +130,7 @@ Page({
     if (!group) return
     this.setData({ groupIndex: index, currentGroup: group })
     this.loadWeekStats()
-    this.loadRecent()
+    this.loadRecent(true)
   },
 
   goCheckin() {

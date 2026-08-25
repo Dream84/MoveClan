@@ -219,3 +219,10 @@
   text-align: center;
   padding: 20rpx 0;
 }
+
+.recent-footer {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 24rpx;
+  padding: 20rpx 0 4rpx;
+}

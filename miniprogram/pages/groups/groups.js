@@ -33,28 +33,10 @@ Page({
   },
 
   async loadGroups() {
-    const db = wx.cloud.database()
-    const _ = db.command
-    const me = app.globalData.openid
-    const memRes = await db.collection('group_members').where({ openid: me }).get()
-    const mems = memRes.data || []
-    if (!mems.length) {
-      this.setData({ myGroups: [] })
-      return
-    }
-    const ids = mems.map(m => m.groupId)
-    const groupRes = await db.collection('groups')
-      .where({ _id: _.in(ids), status: 'active' })
-      .get()
-    const groups = groupRes.data || []
-    const roleMap = {}
-    mems.forEach(m => {
-      roleMap[m.groupId] = m.role
-    })
+    const groups = await app.getMyGroups()
     const myGroups = groups.map(g => ({
       ...g,
-      role: roleMap[g._id] || 'member',
-      roleLabel: constants.ROLE_LABELS[roleMap[g._id]] || '成员',
+      roleLabel: constants.ROLE_LABELS[g.role] || '成员',
       themeLabel: constants.themeLabel(g.sportTheme)
     }))
     this.setData({ myGroups })
@@ -94,6 +76,7 @@ Page({
       description: this.data.createDesc,
       sportTheme: theme
     })
+    app.invalidateMyGroups()
     this.setData({ showCreate: false, createName: '', createDesc: '', themeIndex: 0 })
     wx.showModal({
       title: '创建成功 🎉',
@@ -119,6 +102,7 @@ Page({
       return
     }
     await api.call('joinGroup', { inviteCode: code })
+    app.invalidateMyGroups()
     this.setData({ inviteCode: '' })
     wx.showToast({ title: '加入成功', icon: 'success' })
     this.refresh()

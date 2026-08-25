@@ -9,9 +9,72 @@
   text-align: center;
 }
 
+.detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
 .detail-name {
   font-size: 40rpx;
   font-weight: 800;
+}
+
+.edit-link {
+  position: absolute;
+  right: 0;
+  font-size: 24rpx;
+  color: var(--primary);
+  background: var(--primary-bg);
+  border-radius: 14rpx;
+  padding: 8rpx 20rpx;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  width: 600rpx;
+  padding: 48rpx 40rpx;
+  background: #FFFFFF;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-input {
+  background: #FFF7F0;
+  border-radius: 24rpx;
+  padding: 22rpx 24rpx;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.modal-btns {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  margin: 0;
+  padding: 20rpx 0;
 }
 
 .detail-theme {

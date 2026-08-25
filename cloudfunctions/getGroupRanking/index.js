@@ -1,7 +1,10 @@
 const cloud = require('wx-server-sdk')
+const cache = require('cache')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
+
+const cacheStore = new cache(60 * 1000)
 
 function pad(n) {
   return n < 10 ? '0' + n : '' + n
@@ -44,6 +47,35 @@ async function fetchAll(where) {
   return all
 }
 
+function withThumb(url) {
+  if (!url) return ''
+  const qIdx = url.indexOf('?')
+  if (qIdx >= 0) {
+    return url.slice(0, qIdx) + '?imageMogr2/thumbnail/200x' + '&' + url.slice(qIdx + 1)
+  }
+  return url + '?imageMogr2/thumbnail/200x'
+}
+
+async function resolveAvatarUrls(rows) {
+  const fileIds = rows.map(r => r.avatarUrl).filter(id => id && id.indexOf('cloud://') === 0)
+  const urlMap = {}
+  for (let i = 0; i < fileIds.length; i += 50) {
+    const chunk = fileIds.slice(i, i + 50)
+    try {
+      const res = await cloud.getTempFileURL({ fileList: chunk })
+      ;(res.fileList || []).forEach(item => {
+        if (item.tempFileURL) urlMap[item.fileID] = item.tempFileURL
+      })
+    } catch (err) {
+      console.error('[getTempFileURL]', err)
+    }
+  }
+  return rows.map(r => ({
+    ...r,
+    avatarUrl: withThumb(urlMap[r.avatarUrl] || r.avatarUrl || '')
+  }))
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
@@ -59,6 +91,12 @@ exports.main = async (event) => {
       .count()
     if (my.total === 0) {
       return { code: 3, message: '你不是该群成员' }
+    }
+
+    const cacheKey = `rank:${groupId}:${period}:${sortBy}`
+    const cached = cacheStore.get(cacheKey)
+    if (cached) {
+      return { code: 0, message: 'ok', data: cached }
     }
 
     const memberRes = await db.collection('group_members').where({ groupId }).limit(1000).get()
@@ -115,23 +153,23 @@ exports.main = async (event) => {
     })
 
     const top = list.slice(0, 50)
-    top.forEach((item, idx) => {
+    const withAvatars = await resolveAvatarUrls(top)
+    withAvatars.forEach((item, idx) => {
       item.rank = idx + 1
     })
-    const myIndex = top.findIndex(t => t.openid === OPENID)
-    const myRank = myIndex >= 0 ? top[myIndex].rank : 0
+    const myIndex = withAvatars.findIndex(t => t.openid === OPENID)
+    const myRank = myIndex >= 0 ? withAvatars[myIndex].rank : 0
 
-    return {
-      code: 0,
-      message: 'ok',
-      data: {
-        list: top,
-        myRank,
-        myData: myIndex >= 0 ? top[myIndex] : null,
-        period,
-        sortBy
-      }
+    const data = {
+      list: withAvatars,
+      myRank,
+      myData: myIndex >= 0 ? withAvatars[myIndex] : null,
+      period,
+      sortBy
     }
+    cacheStore.put(cacheKey, data)
+
+    return { code: 0, message: 'ok', data }
   } catch (err) {
     console.error('[getGroupRanking]', err)
     return { code: 500, message: '获取排行失败，请重试' }

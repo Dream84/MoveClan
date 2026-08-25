@@ -62,21 +62,10 @@ Page({
 
   async loadContext() {
     const { id, mode } = this.data
-    const db = wx.cloud.database()
-    const _ = db.command
-    const me = app.globalData.openid
-    const memRes = await db.collection('group_members').where({ openid: me }).get()
-    const mems = memRes.data || []
-    const ids = mems.map(m => m.groupId)
-    let groups = []
-    if (ids.length) {
-      const groupRes = await db.collection('groups')
-        .where({ _id: _.in(ids), status: 'active' })
-        .get()
-      groups = groupRes.data || []
-    }
+    const groupsPromise = app.getMyGroups()
 
     if (mode === 'new') {
+      const groups = await groupsPromise
       let groupIndex = 0
       const cur = app.globalData.currentGroup
       if (cur) {
@@ -96,8 +85,12 @@ Page({
       return
     }
 
-    const rec = await db.collection('checkins').doc(id).get()
-    const r = rec.data
+    const db = wx.cloud.database()
+    const [groups, recRes] = await Promise.all([
+      groupsPromise,
+      db.collection('checkins').doc(id).get()
+    ])
+    const r = recRes.data
     const sportIndex = Math.max(0, constants.SPORT_TYPES.findIndex(s => s.value === r.sportType))
     const sport = constants.SPORT_TYPES[sportIndex]
     const group = groups.find(g => g._id === r.groupId)
@@ -105,7 +98,14 @@ Page({
     if (r.imageFileId) {
       try {
         const t = await wx.cloud.getTempFileURL({ fileList: [r.imageFileId] })
-        imageUrl = (t.fileList && t.fileList[0] && t.fileList[0].tempFileURL) || ''
+        let url = (t.fileList && t.fileList[0] && t.fileList[0].tempFileURL) || ''
+        if (url) {
+          const qIdx = url.indexOf('?')
+          url = qIdx >= 0
+            ? url.slice(0, qIdx) + '?imageMogr2/thumbnail/320x' + '&' + url.slice(qIdx + 1)
+            : url + '?imageMogr2/thumbnail/320x'
+        }
+        imageUrl = url
       } catch (e) {
         console.error('[getTempFileURL]', e)
       }

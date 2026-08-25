@@ -10,7 +10,10 @@ Page({
     isOwner: false,
     isMember: false,
     members: [],
-    loading: true
+    loading: true,
+    showEdit: false,
+    editName: '',
+    editDesc: ''
   },
 
   onLoad(options) {
@@ -42,7 +45,9 @@ Page({
         },
         isOwner: info.isOwner,
         isMember: info.isMember,
-        members
+        members,
+        editName: info.group.name,
+        editDesc: info.group.description || ''
       })
     } catch (err) {
       console.error('[group-detail.loadDetail]', err)
@@ -65,6 +70,50 @@ Page({
       data: this.data.group.inviteCode,
       success: () => wx.showToast({ title: '邀请码已复制', icon: 'success' })
     })
+  },
+
+  noop() {},
+
+  openEdit() {
+    if (!this.data.isOwner) return
+    this.setData({
+      showEdit: true,
+      editName: this.data.group.name,
+      editDesc: this.data.group.description || ''
+    })
+  },
+
+  closeEdit() {
+    this.setData({ showEdit: false })
+  },
+
+  onEditName(e) {
+    this.setData({ editName: e.detail.value })
+  },
+
+  onEditDesc(e) {
+    this.setData({ editDesc: e.detail.value })
+  },
+
+  async saveEdit() {
+    const name = this.data.editName.trim()
+    if (!name) {
+      wx.showToast({ title: '请输入群名称', icon: 'none' })
+      return
+    }
+    try {
+      await api.call('updateGroup', {
+        groupId: this.data.groupId,
+        name,
+        description: this.data.editDesc
+      })
+      app.invalidateMyGroups()
+      this.setData({ showEdit: false })
+      wx.showToast({ title: '已保存', icon: 'success' })
+      this.loadDetail()
+    } catch (err) {
+      console.error('[group-detail.saveEdit]', err)
+    }
   },
 
   onMemberRowTap(e) {
@@ -100,6 +149,7 @@ Page({
       success: async res => {
         if (res.confirm) {
           await api.call('dismissGroup', { groupId: this.data.groupId })
+          app.invalidateMyGroups()
           wx.showToast({ title: '群已解散', icon: 'success' })
           setTimeout(() => wx.navigateBack(), 600)
         }
@@ -115,6 +165,7 @@ Page({
       success: async res => {
         if (res.confirm) {
           await api.call('leaveGroup', { groupId: this.data.groupId })
+          app.invalidateMyGroups()
           wx.showToast({ title: '已退出', icon: 'success' })
           setTimeout(() => wx.navigateBack(), 600)
         }

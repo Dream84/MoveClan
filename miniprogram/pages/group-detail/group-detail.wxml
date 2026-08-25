@@ -1,6 +1,9 @@
 <view class="page" wx:if="{{group}}">
   <view class="detail-card card">
-    <view class="detail-name">{{group.name}}</view>
+    <view class="detail-head">
+      <view class="detail-name">{{group.name}}</view>
+      <text wx:if="{{isOwner}}" class="edit-link" bindtap="openEdit">编辑</text>
+    </view>
     <view class="detail-theme">{{group.themeLabel || '综合'}}</view>
     <view wx:if="{{group.description}}" class="detail-desc">{{group.description}}</view>
 
@@ -39,6 +42,18 @@
   <view class="bottom-actions">
     <button wx:if="{{isOwner}}" class="btn-danger action-btn" bindtap="onDismiss">解散群组</button>
     <button wx:elif="{{isMember}}" class="btn-danger action-btn" bindtap="onLeave">退出群组</button>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showEdit}}" bindtap="closeEdit">
+    <view class="modal card" catchtap="noop">
+      <view class="modal-title">编辑群信息</view>
+      <input class="modal-input" placeholder="群名称（必填）" maxlength="20" value="{{editName}}" bindinput="onEditName" />
+      <input class="modal-input" placeholder="群简介（可选）" maxlength="100" value="{{editDesc}}" bindinput="onEditDesc" />
+      <view class="modal-btns">
+        <button class="btn-ghost modal-btn" bindtap="closeEdit">取消</button>
+        <button class="btn-primary modal-btn" bindtap="saveEdit">保存</button>
+      </view>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="loading-mask">加载中...</view>

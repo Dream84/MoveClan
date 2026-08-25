@@ -22,7 +22,7 @@ MoveClan/
 │   └── components/
 │       ├── calendar/           # 打卡日历组件
 │       └── confetti/           # 成就彩带弹窗组件
-├── cloudfunctions/             # ★ 13 个云函数
+├── cloudfunctions/             # ★ 14 个云函数
 ├── database/                   # 4 个集合的初始化 JSON（权限/索引/示例）
 └── docs/superpowers/specs/     # 设计文档
 ```
@@ -65,7 +65,7 @@ module.exports = {
 
 在开发者工具的资源管理器中，展开 `cloudfunctions`，对每个云函数右键 →「上传并部署：云端安装依赖」。
 
-共 13 个：`login`、`createGroup`、`joinGroup`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`。
+共 14 个：`login`、`createGroup`、`updateGroup`、`joinGroup`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`。
 
 > **内容安全审核（可选）**：`submitCheckin` / `updateCheckin` 通过 `cloud.openapi.security.msgSecCheck` / `imgSecCheck` 调用微信内容安全接口。
 > 若你的小程序类目不支持或接口报错，云函数会自动降级放行并记录日志，不影响打卡功能。
@@ -95,7 +95,12 @@ module.exports = {
 ## 七、数据与性能说明
 
 - 排行榜与统计采用**实时聚合计算**，编辑/删除打卡后立即反映，无脏数据。
-- 前期访问量小，实时聚合完全够用。若后续量大，可增加 `rankSnapshot` 定时云函数：
+- **排行榜缓存**：`getGroupRanking` 内置 60 秒内存缓存（`cache` 包），同一分钟内的多次查看只查一次数据库，大幅降低数据库压力；缓存随云函数实例生命周期自动失效，数据新鲜度最高延迟 60 秒。
+  - 注意：`getGroupRanking` 需「云端安装依赖」（已声明 `cache` 依赖）。
+- **图片加载提速**：排行/成员列表头像由云函数通过 `cloud.getTempFileURL` 换取临时链接并追加 `imageMogr2/thumbnail/200x` 缩略参数，缩略图体积与加载时间可减少 90% 左右；首页/我的页头像直接对 `cloud://` fileID 追加同样参数。
+- **前端分页**：首页「最近打卡」每页加载 5 条，上滑触底自动加载下一页（`skip`/`limit`），不一次性拉取全部历史。
+- **避免二次下载**：项目未使用 `wx.getImageInfo`，图片一律用 `<image>` 的 `src` 直接显示。
+- 若后续访问量进一步增大，可增加 `rankSnapshot` 定时云函数：
   - 新建定时触发器（每天 00:05 触发）云函数，将各群周/月排行结果写入快照集合；
   - `getGroupRanking` 改为优先读快照、下拉刷新时实时重算回写，兼顾速度与新鲜度。
 
