@@ -12,16 +12,18 @@
   </view>
 
   <view wx:if="{{currentGroup}}" class="feed-list">
-    <view wx:if="{{loading}}" class="feed-card card" wx:for="{{[1, 2, 3]}}" wx:key="*this">
-      <view class="feed-head">
-        <view class="sk-circle feed-avatar-sk"></view>
-        <view class="feed-head-text">
-          <view class="sk-block sk-line"></view>
-          <view class="sk-block sk-line-short"></view>
+    <block wx:if="{{loading}}">
+      <view class="feed-card card" wx:for="{{[1, 2, 3]}}" wx:key="*this">
+        <view class="feed-head">
+          <view class="sk-circle feed-avatar-sk"></view>
+          <view class="feed-head-text">
+            <view class="sk-block sk-line"></view>
+            <view class="sk-block sk-line-short"></view>
+          </view>
         </view>
+        <view class="sk-block sk-line feed-sport-sk"></view>
       </view>
-      <view class="sk-block sk-line feed-sport-sk"></view>
-    </view>
+    </block>
     <view wx:elif="{{!list.length}}" class="empty-tip">还没有动态，快去打第一卡吧</view>
     <block wx:else>
       <view class="feed-card card" wx:for="{{list}}" wx:key="_id" wx:for-item="item" wx:for-index="idx">

@@ -18,13 +18,15 @@
   <view class="section-title group-section">我的群组</view>
   <view wx:if="{{!loading && !myGroups.length}}" class="empty-tip">还没有加入任何群组</view>
 
-  <view class="group-item card" wx:if="{{loading}}" wx:for="{{[1, 2]}}" wx:key="*this">
-    <view class="sk-block group-avatar-sk"></view>
-    <view class="group-info">
-      <view class="sk-block sk-line"></view>
-      <view class="sk-block sk-line-short"></view>
+  <block wx:if="{{loading}}">
+    <view class="group-item card" wx:for="{{[1, 2]}}" wx:key="*this">
+      <view class="sk-block group-avatar-sk"></view>
+      <view class="group-info">
+        <view class="sk-block sk-line"></view>
+        <view class="sk-block sk-line-short"></view>
+      </view>
     </view>
-  </view>
+  </block>
 
   <block wx:if="{{!loading}}">
     <view
