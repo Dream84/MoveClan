@@ -29,6 +29,10 @@ Page({
     this.init()
   },
 
+  onHide() {
+    this.showTab()
+  },
+
   onPullDownRefresh() {
     if (!app.throttleRefresh(true)) {
       wx.stopPullDownRefresh()
@@ -150,6 +154,7 @@ Page({
     const item = this.data.list[index]
     if (!item) return
     this.setData({ commentTarget: item, commentText: '' })
+    this.hideTab()
   },
 
   onCommentInput(e) {
@@ -158,6 +163,23 @@ Page({
 
   closeComment() {
     this.setData({ commentTarget: null, commentText: '' })
+    this.showTab()
+  },
+
+  hideTab() {
+    try {
+      wx.hideTabBar({ animation: false })
+    } catch (err) {
+      console.error('[hideTabBar]', err)
+    }
+  },
+
+  showTab() {
+    try {
+      wx.showTabBar({ animation: false })
+    } catch (err) {
+      console.error('[showTabBar]', err)
+    }
   },
 
   async submitComment() {
@@ -186,6 +208,7 @@ Page({
         }
       }
       this.setData({ commentTarget: null, commentText: '' })
+      this.showTab()
     } catch (err) {
       console.error('[feed.comment]', err)
     }
