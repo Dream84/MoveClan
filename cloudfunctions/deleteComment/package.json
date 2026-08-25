@@ -1,0 +1,9 @@
+{
+  "name": "deleteComment",
+  "version": "1.0.0",
+  "description": "删除评论（评论者/群主/打卡发布者可删）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

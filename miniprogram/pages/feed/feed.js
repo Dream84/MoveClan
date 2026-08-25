@@ -175,6 +175,32 @@ Page({
     }, 200)
   },
 
+  onCommentLongPress(e) {
+    const { checkinId, cmId, canDelete, index } = e.currentTarget.dataset
+    if (!canDelete) return
+    wx.showActionSheet({
+      itemList: ['删除'],
+      success: async res => {
+        if (res.tapIndex !== 0) return
+        try {
+          await api.call('deleteComment', { checkinId, commentId: cmId }, { loadingText: '删除中...' })
+          const idx = Number(index)
+          const item = this.data.list[idx]
+          if (item && item._id === checkinId) {
+            const newComments = (item.commentList || []).filter(c => c.id !== cmId)
+            this.setData({
+              [`list[${idx}].commentList`]: newComments,
+              [`list[${idx}].commentCount`]: newComments.length
+            })
+          }
+          wx.showToast({ title: '已删除', icon: 'success' })
+        } catch (err) {
+          console.error('[feed.deleteComment]', err)
+        }
+      }
+    })
+  },
+
   closeComment() {
     this.setData({ commentTarget: null, commentText: '', commentFocus: false })
     this.showTab()

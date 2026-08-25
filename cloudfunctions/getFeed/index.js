@@ -56,6 +56,9 @@ exports.main = async (event) => {
       return { code: 3, message: '你不是该群成员' }
     }
 
+    const ownerRes = await db.collection('groups').where({ _id: groupId }).get()
+    const ownerOpenid = (ownerRes.data[0] && ownerRes.data[0].ownerOpenid) || ''
+
     const res = await db.collection('checkins')
       .where({ groupId })
       .orderBy('createTime', 'desc')
@@ -86,9 +89,42 @@ exports.main = async (event) => {
       imageMap[k] = withThumb(imageFullMap[k], 320)
     })
 
+    // 点赞者小头像（每条约前 9 位）
+    const likerMap = {}
+    const likerOpenids = []
+    rows.forEach(c => {
+      const ids = (c.likeOpenids || []).slice(0, 9)
+      likerMap[c._id] = ids
+      ids.forEach(o => {
+        if (likerOpenids.indexOf(o) < 0) likerOpenids.push(o)
+      })
+    })
+    const likerUserMap = {}
+    if (likerOpenids.length) {
+      const likerRes = await db.collection('users').where({ openid: _.in(likerOpenids) }).get()
+      likerRes.data.forEach(u => {
+        if (u.openid) likerUserMap[u.openid] = u
+      })
+    }
+    const likerAvatarMap = await resolveFileUrls(
+      likerOpenids.map(o => (likerUserMap[o] && likerUserMap[o].avatarUrl) || '').filter(Boolean),
+      60
+    )
+
     const list = rows.map(c => {
       const u = userMap[c.openid] || {}
-      const comments = sortComments(c.comments)
+      const comments = sortComments(c.comments).map(cm => ({
+        ...cm,
+        canDelete: cm.openid === OPENID || ownerOpenid === OPENID || c.openid === OPENID
+      }))
+      const likers = (likerMap[c._id] || []).map(o => {
+        const lu = likerUserMap[o] || {}
+        return {
+          openid: o,
+          nickName: lu.nickName || '用户',
+          avatarUrl: likerAvatarMap[lu.avatarUrl] || ''
+        }
+      })
       return {
         _id: c._id,
         openid: c.openid,
@@ -105,6 +141,7 @@ exports.main = async (event) => {
         imageFullUrl: imageFullMap[c.imageFileId] || imageMap[c.imageFileId] || '',
         likeCount: c.likeCount || 0,
         isLiked: (c.likeOpenids || []).indexOf(OPENID) >= 0,
+        likers,
         commentCount: (c.comments || []).length,
         comments
       }

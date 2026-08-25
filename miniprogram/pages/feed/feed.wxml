@@ -58,8 +58,19 @@
           </view>
         </view>
 
+        <view class="feed-likers" wx:if="{{item.likers.length}}">
+          <block wx:for="{{item.likers}}" wx:key="openid" wx:for-item="lk">
+            <image wx:if="{{lk.avatarUrl}}" class="liker-avatar" src="{{lk.avatarUrl}}" mode="aspectFill"></image>
+            <view wx:else class="liker-avatar liker-fallback">{{lk.nickName[0]}}</view>
+          </block>
+          <text class="liker-more" wx:if="{{item.likeCount > item.likers.length}}">+{{item.likeCount - item.likers.length}}</text>
+        </view>
+
         <view class="feed-comments" wx:if="{{item.commentList.length}}">
-          <view class="comment" wx:for="{{item.commentList}}" wx:key="id" wx:for-item="cm" wx:for-index="ci">
+          <view class="comment" wx:for="{{item.commentList}}" wx:key="id" wx:for-item="cm" wx:for-index="ci"
+            data-checkin-id="{{item._id}}" data-cm-id="{{cm.id}}" data-can-delete="{{cm.canDelete}}" data-index="{{idx}}"
+            bindlongpress="onCommentLongPress"
+          >
             <block wx:if="{{item.expanded || ci < 5}}">
               <text class="cm-name">{{cm.nickName}}：</text>
               <text class="cm-content">{{cm.content}}</text>

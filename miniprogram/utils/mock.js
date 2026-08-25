@@ -104,7 +104,7 @@ function buildMockCheckins() {
         _openid: openid,
         groupId: 'g1',
         openid,
-        checkDate: dayStr(-item.offset),
+        checkDate: dayStr(item.offset),
         sportType: item.type,
         duration: item.dur,
         calories: item.cal,
@@ -114,7 +114,7 @@ function buildMockCheckins() {
         likeOpenids: [],
         likeCount: 0,
         comments: [],
-        createTime: new Date(Date.now() - item.offset * 86400000)
+        createTime: new Date(Date.now() + item.offset * 86400000)
       })
     })
   })
@@ -389,9 +389,17 @@ const handlers = {
       .filter(c => c.groupId === groupId || !groupId)
       .sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
     const slice = rows.slice(p * size, p * size + size)
+    const ownerOpenid = MOCK_OPENID
     const list = slice.map(c => {
       const u = userByOpenid(c.openid)
-      const comments = (c.comments || []).slice().sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
+      const comments = (c.comments || []).slice().sort((a, b) => new Date(b.createTime) - new Date(a.createTime)).map(cm => ({
+        ...cm,
+        canDelete: cm.openid === MOCK_OPENID || ownerOpenid === MOCK_OPENID || c.openid === MOCK_OPENID
+      }))
+      const likers = (c.likeOpenids || []).slice(0, 9).map(o => {
+        const lu = userByOpenid(o)
+        return { openid: o, nickName: lu.nickName, avatarUrl: lu.avatarUrl }
+      })
       return {
         _id: c._id,
         openid: c.openid,
@@ -407,6 +415,7 @@ const handlers = {
         imageUrl: '',
         likeCount: c.likeCount || 0,
         isLiked: (c.likeOpenids || []).indexOf(MOCK_OPENID) >= 0,
+        likers,
         commentCount: (c.comments || []).length,
         comments
       }
@@ -443,6 +452,13 @@ const handlers = {
     c.comments = c.comments || []
     c.comments.push(comment)
     return { code: 0, message: 'ok', data: { comment } }
+  },
+
+  deleteComment({ checkinId, commentId }) {
+    const c = mockCheckins.find(x => x._id === checkinId)
+    if (!c) return { code: 2, message: '动态不存在' }
+    c.comments = (c.comments || []).filter(cm => cm.id !== commentId)
+    return { code: 0, message: 'ok', data: {} }
   }
 }
 
