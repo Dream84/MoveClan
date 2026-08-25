@@ -6,6 +6,26 @@ const _ = db.command
 
 const cacheStore = new cache(60 * 1000)
 
+const SORT_FIELDS = { count: 'count', calories: 'totalCalories', duration: 'totalDuration' }
+
+async function buildResponse(list, OPENID, period, sortBy) {
+  const top = list.slice(0, 50)
+  const withAvatars = await resolveAvatarUrls(top)
+  withAvatars.forEach((item, idx) => {
+    item.rank = idx + 1
+  })
+  const fullIndex = list.findIndex(t => t.openid === OPENID)
+  const myRank = fullIndex >= 0 ? fullIndex + 1 : 0
+  const myData = fullIndex >= 0 ? { ...list[fullIndex], rank: myRank } : null
+  return {
+    list: withAvatars,
+    myRank,
+    myData,
+    period,
+    sortBy
+  }
+}
+
 function pad(n) {
   return n < 10 ? '0' + n : '' + n
 }
@@ -81,6 +101,7 @@ exports.main = async (event) => {
   const groupId = event.groupId || ''
   const period = event.period === 'month' ? 'month' : 'week'
   const sortBy = ['count', 'calories', 'duration'].indexOf(event.sortBy) >= 0 ? event.sortBy : 'count'
+  const sortField = SORT_FIELDS[sortBy]
   if (!groupId) {
     return { code: 1, message: '参数错误' }
   }
@@ -94,9 +115,9 @@ exports.main = async (event) => {
     }
 
     const cacheKey = `rank:${groupId}:${period}:${sortBy}`
-    const cached = cacheStore.get(cacheKey)
-    if (cached && event.refresh !== true) {
-      return { code: 0, message: 'ok', data: cached }
+    const cachedList = cacheStore.get(cacheKey)
+    if (cachedList && event.refresh !== true) {
+      return { code: 0, message: 'ok', data: await buildResponse(cachedList, OPENID, period, sortBy) }
     }
 
     const memberRes = await db.collection('group_members').where({ groupId }).limit(1000).get()
@@ -147,29 +168,14 @@ exports.main = async (event) => {
     }))
 
     list.sort((a, b) => {
-      if (b[sortBy] !== a[sortBy]) return b[sortBy] - a[sortBy]
+      const diff = b[sortField] - a[sortField]
+      if (diff !== 0) return diff
       if (b.count !== a.count) return b.count - a.count
       return a.openid.localeCompare(b.openid)
     })
 
-    const top = list.slice(0, 50)
-    const withAvatars = await resolveAvatarUrls(top)
-    withAvatars.forEach((item, idx) => {
-      item.rank = idx + 1
-    })
-    const myIndex = withAvatars.findIndex(t => t.openid === OPENID)
-    const myRank = myIndex >= 0 ? withAvatars[myIndex].rank : 0
-
-    const data = {
-      list: withAvatars,
-      myRank,
-      myData: myIndex >= 0 ? withAvatars[myIndex] : null,
-      period,
-      sortBy
-    }
-    cacheStore.put(cacheKey, data)
-
-    return { code: 0, message: 'ok', data }
+    cacheStore.put(cacheKey, list)
+    return { code: 0, message: 'ok', data: await buildResponse(list, OPENID, period, sortBy) }
   } catch (err) {
     console.error('[getGroupRanking]', err)
     return { code: 500, message: '获取排行失败，请重试' }

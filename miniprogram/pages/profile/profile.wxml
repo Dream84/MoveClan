@@ -1,7 +1,7 @@
 <view class="page">
   <view class="profile-card card">
     <view class="avatar-wrap">
-      <image wx:if="{{userInfo.avatarUrl}}" class="avatar" src="{{userInfo.avatarUrl}}?imageMogr2/thumbnail/200x" mode="aspectFill"></image>
+      <image wx:if="{{avatarDisplay}}" class="avatar" src="{{avatarDisplay}}" mode="aspectFill"></image>
       <view wx:else class="avatar avatar-fallback">{{userInfo.nickName ? userInfo.nickName[0] : '跃'}}</view>
     </view>
     <view class="profile-text">

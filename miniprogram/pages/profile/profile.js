@@ -6,6 +6,7 @@ const app = getApp()
 Page({
   data: {
     userInfo: null,
+    avatarDisplay: '',
     stats: {
       totalCount: 0,
       totalCalories: 0,
@@ -16,8 +17,8 @@ Page({
       monthCalories: 0,
       streakDays: 0
     },
-    calYear: 0,
-    calMonth: 0,
+    calYear: new Date().getFullYear(),
+    calMonth: new Date().getMonth() + 1,
     calValue: [],
     statsLoaded: false,
     subscribeEnabled: false,
@@ -43,6 +44,7 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
         subscribeEnabled: wx.getStorageSync('subscribeEnabled') || false
       })
       await this.loadStats(!!pull)
@@ -53,8 +55,13 @@ Page({
 
   async loadStats(pull) {
     this.setData({ statsLoaded: false })
-    const stats = await api.call('getMyStats', { refresh: !!pull }, { loading: false })
-    this.setData({ stats, statsLoaded: true })
+    try {
+      const stats = await api.call('getMyStats', { refresh: !!pull }, { loading: false })
+      this.setData({ stats, statsLoaded: true })
+    } catch (err) {
+      console.error('[profile.loadStats]', err)
+      this.setData({ statsLoaded: true })
+    }
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth() + 1
@@ -65,17 +72,25 @@ Page({
     const db = wx.cloud.database()
     const _ = db.command
     const range = dateUtil.getMonthRange(`${year}-${dateUtil.pad(month)}-01`)
-    const res = await db.collection('checkins')
-      .where({
-        openid: app.globalData.openid,
-        checkDate: _.gte(range.start).and(_.lte(range.end))
-      })
-      .field({ checkDate: true, count: true })
-      .get()
     const countMap = {}
-    res.data.forEach(c => {
-      countMap[c.checkDate] = (countMap[c.checkDate] || 0) + c.count
-    })
+    let offset = 0
+    while (true) {
+      const res = await db.collection('checkins')
+        .where({
+          openid: app.globalData.openid,
+          checkDate: _.gte(range.start).and(_.lte(range.end))
+        })
+        .field({ checkDate: true, count: true })
+        .orderBy('checkDate', 'asc')
+        .skip(offset)
+        .limit(20)
+        .get()
+      ;(res.data || []).forEach(c => {
+        countMap[c.checkDate] = (countMap[c.checkDate] || 0) + c.count
+      })
+      if (!res.data || res.data.length < 20) break
+      offset += 20
+    }
     const calValue = Object.keys(countMap)
       .sort()
       .map(date => ({ date, count: countMap[date] }))
@@ -132,7 +147,7 @@ Page({
       let avatarUrl = this.data.editAvatarUrl
       if (this.data.editAvatarTemp) {
         const openid = app.globalData.openid
-        const res = await api.uploadImage(this.data.editAvatarTemp, 'profile', null)
+        const res = await api.uploadImage(this.data.editAvatarTemp, openid, null)
         avatarUrl = res.fileID
       }
       const user = await api.call('login', {
@@ -143,6 +158,7 @@ Page({
       app.setUserInfo(user)
       this.setData({
         userInfo: user,
+        avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
         showEdit: false
       })
       wx.showToast({ title: '已保存', icon: 'success' })

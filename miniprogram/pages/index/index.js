@@ -18,14 +18,17 @@ function greeting() {
 Page({
   data: {
     userInfo: null,
+    avatarDisplay: '',
     greeting: '',
     groups: [],
     groupIndex: 0,
     currentGroup: null,
+    selectedGroupId: '',
     weekStats: { weekCount: 0, weekCalories: 0, streakDays: 0 },
     recentCheckins: [],
     recentPage: 0,
     recentHasMore: false,
+    recentLoading: false,
     loading: true
   },
 
@@ -50,6 +53,7 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
         greeting: greeting()
       })
       await this.loadGroups(!!pull)
@@ -63,8 +67,21 @@ Page({
 
   async loadGroups(force) {
     const groups = await app.getMyGroups(force)
-    const currentGroup = groups[0] || null
-    this.setData({ groups, currentGroup, groupIndex: 0 })
+    let groupIndex = 0
+    if (this.data.selectedGroupId) {
+      const idx = groups.findIndex(g => g._id === this.data.selectedGroupId)
+      if (idx >= 0) groupIndex = idx
+    }
+    const currentGroup = groups[groupIndex] || null
+    this.setData({
+      groups,
+      currentGroup,
+      groupIndex,
+      selectedGroupId: currentGroup ? currentGroup._id : ''
+    })
+    if (currentGroup) {
+      app.setCurrentGroup(currentGroup)
+    }
   },
 
   async loadWeekStats(force) {
@@ -91,27 +108,27 @@ Page({
     }
     const page = reset ? 0 : this.data.recentPage
     if (this.data.recentLoading) return
+    const reqGroupId = group._id
     this.setData({ recentLoading: true })
     try {
       const db = wx.cloud.database()
       const res = await db.collection('checkins')
-        .where({ openid: app.globalData.openid })
+        .where({ groupId: reqGroupId, openid: app.globalData.openid })
         .orderBy('checkDate', 'desc')
         .skip(page * RECENT_PAGE_SIZE)
         .limit(RECENT_PAGE_SIZE)
         .get()
+      if (!this.data.currentGroup || this.data.currentGroup._id !== reqGroupId) return
       const raw = res.data || []
-      const rows = raw
-        .filter(c => c.groupId === group._id)
-        .map(c => ({
-          _id: c._id,
-          sportLabel: constants.sportLabel(c.sportType),
-          duration: c.duration,
-          calories: c.calories,
-          checkDate: c.checkDate,
-          count: c.count,
-          hasImage: !!c.imageFileId
-        }))
+      const rows = raw.map(c => ({
+        _id: c._id,
+        sportLabel: constants.sportLabel(c.sportType),
+        duration: c.duration,
+        calories: c.calories,
+        checkDate: c.checkDate,
+        count: c.count,
+        hasImage: !!c.imageFileId
+      }))
       this.setData({
         recentCheckins: reset ? rows : this.data.recentCheckins.concat(rows),
         recentPage: page + 1,
@@ -120,7 +137,9 @@ Page({
     } catch (err) {
       console.error('[index.loadRecent]', err)
     } finally {
-      this.setData({ recentLoading: false })
+      if (this.data.currentGroup && this.data.currentGroup._id === reqGroupId) {
+        this.setData({ recentLoading: false })
+      }
     }
   },
 
@@ -128,7 +147,8 @@ Page({
     const index = Number(e.detail.value)
     const group = this.data.groups[index]
     if (!group) return
-    this.setData({ groupIndex: index, currentGroup: group })
+    this.setData({ groupIndex: index, currentGroup: group, selectedGroupId: group._id })
+    app.setCurrentGroup(group)
     this.loadWeekStats()
     this.loadRecent(true)
   },
@@ -159,12 +179,15 @@ Page({
       wx.showLoading({ title: '设置中...', mask: true })
       let avatarUrl = ''
       if (userInfo.avatarUrl) {
-        const up = await api.uploadImage(userInfo.avatarUrl, 'profile', null)
+        const up = await api.uploadImage(userInfo.avatarUrl, app.globalData.openid, null)
         avatarUrl = up.fileID
       }
       const user = await api.call('login', { nickName: userInfo.nickName, avatarUrl }, { loading: false })
       app.setUserInfo(user)
-      this.setData({ userInfo: user })
+      this.setData({
+        userInfo: user,
+        avatarDisplay: api.avatarSrc(user.avatarUrl, 200)
+      })
       wx.showToast({ title: '已使用微信资料', icon: 'success' })
     } catch (err) {
       console.error('[useWechatProfile]', err)

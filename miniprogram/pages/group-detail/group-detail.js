@@ -136,12 +136,16 @@ Page({
       confirmColor: '#F5222D',
       success: async res => {
         if (res.confirm) {
-          await api.call('removeMember', {
-            groupId: this.data.groupId,
-            targetOpenid: member.openid
-          })
-          wx.showToast({ title: '已移除', icon: 'success' })
-          this.loadDetail()
+          try {
+            await api.call('removeMember', {
+              groupId: this.data.groupId,
+              targetOpenid: member.openid
+            })
+            wx.showToast({ title: '已移除', icon: 'success' })
+            this.loadDetail()
+          } catch (err) {
+            console.error('[group-detail.removeMember]', err)
+          }
         }
       }
     })
@@ -154,10 +158,14 @@ Page({
       confirmColor: '#F5222D',
       success: async res => {
         if (res.confirm) {
-          await api.call('dismissGroup', { groupId: this.data.groupId })
-          app.invalidateMyGroups()
-          wx.showToast({ title: '群已解散', icon: 'success' })
-          setTimeout(() => wx.navigateBack(), 600)
+          try {
+            await api.call('dismissGroup', { groupId: this.data.groupId })
+            app.invalidateMyGroups()
+            wx.showToast({ title: '群已解散', icon: 'success' })
+            setTimeout(() => wx.navigateBack(), 600)
+          } catch (err) {
+            console.error('[group-detail.dismiss]', err)
+          }
         }
       }
     })
@@ -170,10 +178,14 @@ Page({
       confirmColor: '#F5222D',
       success: async res => {
         if (res.confirm) {
-          await api.call('leaveGroup', { groupId: this.data.groupId })
-          app.invalidateMyGroups()
-          wx.showToast({ title: '已退出', icon: 'success' })
-          setTimeout(() => wx.navigateBack(), 600)
+          try {
+            await api.call('leaveGroup', { groupId: this.data.groupId })
+            app.invalidateMyGroups()
+            wx.showToast({ title: '已退出', icon: 'success' })
+            setTimeout(() => wx.navigateBack(), 600)
+          } catch (err) {
+            console.error('[group-detail.leave]', err)
+          }
         }
       }
     })

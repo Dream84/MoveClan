@@ -301,7 +301,7 @@ Page({
         console.error('[achievement check]', e)
       }
 
-      if (newMilestones.length) {
+      if (this.data.mode === 'new' && newMilestones.length) {
         this.setData({
           showConfetti: true,
           confettiTitle: `连续打卡 ${newMilestones[0]} 天`,

@@ -2,7 +2,42 @@
 
 本项目为微信小程序 + 云开发应用。每个版本条目列出「变更内容」与「重新部署需要进行的操作」。
 
-## v0.5.0 — 科学估算卡路里 + 更多运动类型 + 个人体重（工作区，待提交）
+## v0.6.0 — 代码审查修复（2026-08-25，工作区，待提交）
+
+### 变更内容
+- **安全修复**：
+  - 排行榜缓存此前把「我的排名/我的数据」按群级 key 缓存，同一分钟内其他成员可能拿到别人的排名数据 → 改为只缓存群列表，`myRank`/`myData` 每次按请求者即时计算；
+  - `groups` 集合权限由「所有用户可读」收紧为「仅管理端可读写」，新增云函数 `getMyGroups`（60s 缓存）读取群列表，`getGroupInfo` 增加成员身份校验，堵住邀请码被任意读取绕过入群的问题。
+- **Bug 修复**：
+  - 排行榜按「卡路里/时长」排序失效（字段名与排序字段不匹配，实际回落为按次数）→ 增加字段映射；
+  - 排名第 51 名及之后的成员 `myRank`/`myData` 错误 → 改为基于全量排序列表计算；
+  - `updateCheckin` 未校验目标群成员身份，可把记录挪到非成员群 → 增加校验；
+  - `createGroup` 群/成员两次写入失败无补偿 → 成员写入失败时回滚删除群文档；邀请码唯一索引冲突自动重试；
+  - `backfill-openid.js` 对缺 `openid` 的记录会无限循环 → 增加已处理集合防死循环；
+  - `getMyStats` 带群参数时无成员校验 → 增加校验。
+- **前端修复**：
+  - 首页切群不传播到打卡表单（`setCurrentGroup` 从未被调用）→ 切群/加载时同步到全局，且切群、onShow 后保持所选群不回跳第一个；
+  - 最近打卡按 `openid` 分页后客户端过滤群，跨群用户分页错乱 → 查询条件加入 `groupId`，新增索引 `(groupId, openid, checkDate)`；
+  - 切群时旧群分页请求可能覆盖新群数据 → 增加请求时效校验；
+  - 排行页快速切换时旧响应覆盖新结果 → 增加请求序号防乱序；
+  - 「我的」日历每月仅取 20 条（客户端上限）→ 分页拉全；
+  - 「我的」统计加载失败卡骨架屏 → try/finally 兜底；
+  - 头像 URL 仅在 `cloud://` 时追加缩略参数，避免污染非云存储地址；头像上传路径改用真实 openid；
+  - 打卡成就弹窗仅在新建时触发；事件处理补 catch 防未处理拒绝；`wx:key` 修正；日历初始月份修正。
+
+### 重新部署需要进行的操作
+1. **云函数**（云端安装依赖）：
+   - 新增：`getMyGroups`（含 cache 依赖，必须云端安装依赖）
+   - 重部署：`getGroupRanking`、`getGroupInfo`、`updateCheckin`、`createGroup`、`getMyStats`
+2. **数据库**：
+   - `groups` 集合权限改为「仅管理端可读写」；
+   - `checkins` 新建索引 `(groupId, openid, checkDate)`；
+   - 存量数据回填 `_openid`（如存在旧数据，用 `database/backfill-openid.js`）。
+3. **前端**：重新编译小程序。
+
+---
+
+## v0.5.0 — 科学估算 + 骨架屏 + 缓存/下拉刷新（2026-08-25，commit 5293b58，含 v0.4.1 内容）
 
 ### 变更内容
 - **科学估算公式（默认隐藏）**：卡路里估算公式 `消耗热量(千卡) = MET值 × 体重(公斤) × 时长(小时)` 默认不展示；卡路里输入框旁有「?」图标，点击后展开显示公式与当前运动 MET。
@@ -116,13 +151,14 @@
 
 ---
 
-## 当前累计待部署清单（v0.4.0 全部落地后）
+## 当前累计待部署清单（v0.6.0 全部落地后）
 
 | 动作 | 对象 |
 |---|---|
-| 重新部署云函数（云端安装依赖） | `login`、`createGroup`、`joinGroup`、`submitCheckin`、`dismissGroup`、`leaveGroup`、`removeMember`、`getGroupRanking`、`getGroupMembers`、`getMyStats` |
-| 新增云函数（云端安装依赖） | `updateGroup` |
-| 重新编译前端 | 全部页面 |
+| 新增云函数（云端安装依赖） | `getMyGroups`（含 cache 依赖）、`updateGroup` |
+| 重新部署云函数（云端安装依赖） | `login`、`createGroup`、`joinGroup`、`submitCheckin`、`updateCheckin`、`dismissGroup`、`leaveGroup`、`removeMember`、`getGroupRanking`、`getGroupMembers`、`getMyStats`、`getGroupInfo` |
+| 数据库配置 | `groups` 权限改「仅管理端可读写」；`checkins` 建索引 `(groupId, openid, checkDate)` |
 | 存量数据回填 | `group_members` / `checkins` 补 `_openid`（如环境中有旧数据） |
+| 重新编译前端 | 全部页面 |
 
-> 未改动无需重部署的云函数：`getGroupInfo`、`updateCheckin`、`deleteCheckin`、`getMyStats`。
+> 未改动无需重部署的云函数：`deleteCheckin`。

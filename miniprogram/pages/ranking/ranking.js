@@ -8,6 +8,7 @@ Page({
     groups: [],
     groupIndex: 0,
     currentGroup: null,
+    selectedGroupId: '',
     period: 'week',
     sortBy: 'count',
     sortLabels: ['打卡次数', '消耗卡路里', '运动时长'],
@@ -17,6 +18,10 @@ Page({
     myData: null,
     myOpenid: '',
     loading: true
+  },
+
+  onLoad() {
+    this._rankReqId = 0
   },
 
   onShow() {
@@ -44,35 +49,55 @@ Page({
 
   async loadGroups() {
     const groups = await app.getMyGroups()
-    this.setData({ groups, currentGroup: groups[0] || null, groupIndex: 0 })
+    let groupIndex = 0
+    if (this.data.selectedGroupId) {
+      const idx = groups.findIndex(g => g._id === this.data.selectedGroupId)
+      if (idx >= 0) groupIndex = idx
+    }
+    const currentGroup = groups[groupIndex] || null
+    this.setData({
+      groups,
+      currentGroup,
+      groupIndex,
+      selectedGroupId: currentGroup ? currentGroup._id : ''
+    })
   },
 
-  async loadRanking(pull) {
+  loadRanking(pull) {
     const group = this.data.currentGroup
     if (!group) {
       this.setData({ list: [], myRank: 0, myData: null })
-      return
+      return Promise.resolve()
     }
-    const data = await api.call('getGroupRanking', {
+    const reqId = ++this._rankReqId
+    return api.call('getGroupRanking', {
       groupId: group._id,
       period: this.data.period,
       sortBy: this.data.sortBy,
       refresh: !!pull
     }, { loading: false })
-    const myOpenid = this.data.myOpenid
-    const list = (data.list || []).map(item => ({
-      ...item,
-      isMe: item.openid === myOpenid,
-      medal: item.rank <= 3 ? item.rank : 0
-    }))
-    this.setData({ list, myRank: data.myRank, myData: data.myData })
+      .then(data => {
+        if (reqId !== this._rankReqId) return
+        const myOpenid = this.data.myOpenid
+        const list = (data.list || []).map(item => ({
+          ...item,
+          isMe: item.openid === myOpenid,
+          medal: item.rank <= 3 ? item.rank : 0
+        }))
+        this.setData({ list, myRank: data.myRank, myData: data.myData })
+      })
+      .catch(err => {
+        if (reqId === this._rankReqId) {
+          console.error('[ranking.loadRanking]', err)
+        }
+      })
   },
 
   onGroupChange(e) {
     const index = Number(e.detail.value)
     const group = this.data.groups[index]
     if (!group) return
-    this.setData({ groupIndex: index, currentGroup: group })
+    this.setData({ groupIndex: index, currentGroup: group, selectedGroupId: group._id })
     this.loadRanking()
   },
 

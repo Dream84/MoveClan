@@ -102,6 +102,14 @@ exports.main = async (event) => {
   }
 
   try {
+    if (groupId) {
+      const member = await db.collection('group_members')
+        .where({ groupId, openid: OPENID })
+        .count()
+      if (member.total === 0) {
+        return { code: 3, message: '你不是该群成员' }
+      }
+    }
     const statsField = { groupId: true, openid: true, checkDate: true, duration: true, calories: true, count: true }
 
     const statsRows = await fetchAll({

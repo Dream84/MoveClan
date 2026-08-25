@@ -26,13 +26,14 @@
     </view>
   </view>
 
-  <view
-    class="group-item card"
-    wx:for="{{myGroups}}"
-    wx:key="_id"
-    data-id="{{item._id}}"
-    bindtap="goDetail"
-  >
+  <block wx:if="{{!loading}}">
+    <view
+      class="group-item card"
+      wx:for="{{myGroups}}"
+      wx:key="_id"
+      data-id="{{item._id}}"
+      bindtap="goDetail"
+    >
     <view class="group-avatar">
       <text>{{item.name[0]}}</text>
     </view>
@@ -45,7 +46,8 @@
       </view>
     </view>
     <text class="group-arrow">›</text>
-  </view>
+    </view>
+  </block>
 
   <view class="modal-mask" wx:if="{{showCreate}}" bindtap="closeCreate">
     <view class="modal card" catchtap="noop">

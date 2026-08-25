@@ -71,24 +71,28 @@ Page({
       return
     }
     const theme = this.data.themes[this.data.themeIndex].value
-    const data = await api.call('createGroup', {
-      name,
-      description: this.data.createDesc,
-      sportTheme: theme
-    })
-    app.invalidateMyGroups()
-    this.setData({ showCreate: false, createName: '', createDesc: '', themeIndex: 0 })
-    wx.showModal({
-      title: '创建成功 🎉',
-      content: '群邀请码：' + data.inviteCode,
-      confirmText: '复制邀请码',
-      success: res => {
-        if (res.confirm) {
-          wx.setClipboardData({ data: data.inviteCode })
+    try {
+      const data = await api.call('createGroup', {
+        name,
+        description: this.data.createDesc,
+        sportTheme: theme
+      })
+      app.invalidateMyGroups()
+      this.setData({ showCreate: false, createName: '', createDesc: '', themeIndex: 0 })
+      wx.showModal({
+        title: '创建成功 🎉',
+        content: '群邀请码：' + data.inviteCode,
+        confirmText: '复制邀请码',
+        success: res => {
+          if (res.confirm) {
+            wx.setClipboardData({ data: data.inviteCode })
+          }
         }
-      }
-    })
-    this.refresh()
+      })
+      this.refresh()
+    } catch (err) {
+      console.error('[groups.doCreate]', err)
+    }
   },
 
   onInviteInput(e) {
@@ -101,11 +105,15 @@ Page({
       wx.showToast({ title: '请输入邀请码', icon: 'none' })
       return
     }
-    await api.call('joinGroup', { inviteCode: code })
-    app.invalidateMyGroups()
-    this.setData({ inviteCode: '' })
-    wx.showToast({ title: '加入成功', icon: 'success' })
-    this.refresh()
+    try {
+      await api.call('joinGroup', { inviteCode: code })
+      app.invalidateMyGroups()
+      this.setData({ inviteCode: '' })
+      wx.showToast({ title: '加入成功', icon: 'success' })
+      this.refresh()
+    } catch (err) {
+      console.error('[groups.doJoin]', err)
+    }
   },
 
   goDetail(e) {

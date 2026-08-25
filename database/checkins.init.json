@@ -18,6 +18,15 @@
         { "field": "checkDate", "order": "asc" }
       ],
       "unique": false
+    },
+    {
+      "name": "groupId_openid_checkDate",
+      "fields": [
+        { "field": "groupId", "order": "asc" },
+        { "field": "openid", "order": "asc" },
+        { "field": "checkDate", "order": "desc" }
+      ],
+      "unique": false
     }
   ],
   "sampleDocs": [
@@ -37,5 +46,5 @@
       "updateTime": { "$date": 1756041600000 }
     }
   ],
-  "note": "权限选择「仅创建者可读写」，排行榜/统计聚合全部走云函数。创建两个复合索引：排行榜聚合用 (groupId, checkDate)，个人统计用 (openid, checkDate)。"
+  "note": "权限选择「仅创建者可读写」，排行榜/统计聚合全部走云函数。创建复合索引：排行榜聚合用 (groupId, checkDate)，个人统计用 (openid, checkDate)，首页最近打卡分页用 (groupId, openid, checkDate)。"
 }

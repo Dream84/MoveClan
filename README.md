@@ -22,7 +22,7 @@ MoveClan/
 │   └── components/
 │       ├── calendar/           # 打卡日历组件
 │       └── confetti/           # 成就彩带弹窗组件
-├── cloudfunctions/             # ★ 14 个云函数
+├── cloudfunctions/             # ★ 15 个云函数
 ├── database/                   # 4 个集合的初始化 JSON（权限/索引/示例）
 └── docs/superpowers/specs/     # 设计文档
 ```
@@ -55,9 +55,9 @@ module.exports = {
 | 集合 | 权限设置 | 索引（索引管理里创建） |
 |---|---|---|
 | `users` | 仅创建者可读写 | `openid` 唯一索引 |
-| `groups` | 所有用户可读 | `inviteCode` 唯一索引；`status` |
+| `groups` | 仅管理端可读写（防邀请码直读） | `inviteCode` 唯一索引；`status` |
 | `group_members` | 仅创建者可读写 | `(groupId, openid)` 唯一索引；`openid` |
-| `checkins` | 仅创建者可读写 | `(groupId, checkDate)`；`(openid, checkDate)` |
+| `checkins` | 仅创建者可读写 | `(groupId, checkDate)`；`(openid, checkDate)`；`(groupId, openid, checkDate)` |
 
 > `database/*.init.json` 内的 `sampleDocs` 仅供参考字段结构，可直接跳过不导入。
 
@@ -65,7 +65,7 @@ module.exports = {
 
 在开发者工具的资源管理器中，展开 `cloudfunctions`，对每个云函数右键 →「上传并部署：云端安装依赖」。
 
-共 14 个：`login`、`createGroup`、`updateGroup`、`joinGroup`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`。
+共 15 个：`login`、`createGroup`、`updateGroup`、`joinGroup`、`getMyGroups`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`。
 
 > **内容安全审核（可选）**：`submitCheckin` / `updateCheckin` 通过 `cloud.openapi.security.msgSecCheck` / `imgSecCheck` 调用微信内容安全接口。
 > 若你的小程序类目不支持或接口报错，云函数会自动降级放行并记录日志，不影响打卡功能。

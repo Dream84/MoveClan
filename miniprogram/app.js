@@ -74,32 +74,13 @@ App({
     if (!force && this.globalData.myGroups) {
       return this.globalData.myGroups
     }
-    const me = this.globalData.openid
-    if (!me) {
+    if (!this.globalData.openid) {
       this.globalData.myGroups = []
       return []
     }
     try {
-      const db = wx.cloud.database()
-      const _ = db.command
-      const memRes = await db.collection('group_members').where({ openid: me }).get()
-      const mems = memRes.data || []
-      if (!mems.length) {
-        this.globalData.myGroups = []
-        return []
-      }
-      const ids = mems.map(m => m.groupId)
-      const roleMap = {}
-      mems.forEach(m => {
-        roleMap[m.groupId] = m.role
-      })
-      const groupRes = await db.collection('groups')
-        .where({ _id: _.in(ids), status: 'active' })
-        .get()
-      this.globalData.myGroups = (groupRes.data || []).map(g => ({
-        ...g,
-        role: roleMap[g._id] || 'member'
-      }))
+      const groups = await api.call('getMyGroups', { refresh: !!force }, { loading: false })
+      this.globalData.myGroups = groups || []
       return this.globalData.myGroups
     } catch (err) {
       console.error('[getMyGroups]', err)

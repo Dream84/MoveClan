@@ -35,38 +35,58 @@ exports.main = async (event) => {
     const nickName = user ? user.nickName : '微信用户'
     const avatarUrl = user ? user.avatarUrl : ''
 
-    const inviteCode = await genInviteCode()
-    if (!inviteCode) {
-      return { code: 500, message: '邀请码生成失败，请重试' }
+    let addRes = null
+    let createdInviteCode = ''
+    for (let attempt = 0; attempt < 5 && !addRes; attempt++) {
+      const inviteCode = await genInviteCode()
+      if (!inviteCode) {
+        return { code: 500, message: '邀请码生成失败，请重试' }
+      }
+      try {
+        addRes = await db.collection('groups').add({
+          data: {
+            _openid: OPENID,
+            name,
+            description,
+            sportTheme,
+            inviteCode,
+            ownerOpenid: OPENID,
+            memberCount: 1,
+            createTime: db.serverDate(),
+            status: 'active'
+          }
+        })
+        createdInviteCode = inviteCode
+      } catch (e) {
+        const dup = e && (
+          e.errCode === -502001 ||
+          /duplicate|E11000/i.test(e.errMsg || e.message || '')
+        )
+        if (!dup) throw e
+      }
+    }
+    if (!addRes) {
+      return { code: 500, message: '创建失败，请重试' }
     }
 
-    const addRes = await db.collection('groups').add({
-      data: {
-        _openid: OPENID,
-        name,
-        description,
-        sportTheme,
-        inviteCode,
-        ownerOpenid: OPENID,
-        memberCount: 1,
-        createTime: db.serverDate(),
-        status: 'active'
-      }
-    })
+    try {
+      await db.collection('group_members').add({
+        data: {
+          _openid: OPENID,
+          groupId: addRes._id,
+          openid: OPENID,
+          role: 'owner',
+          joinTime: db.serverDate(),
+          nickName,
+          avatarUrl
+        }
+      })
+    } catch (err) {
+      await db.collection('groups').doc(addRes._id).remove()
+      throw err
+    }
 
-    await db.collection('group_members').add({
-      data: {
-        _openid: OPENID,
-        groupId: addRes._id,
-        openid: OPENID,
-        role: 'owner',
-        joinTime: db.serverDate(),
-        nickName,
-        avatarUrl
-      }
-    })
-
-    return { code: 0, message: 'ok', data: { _id: addRes._id, inviteCode } }
+    return { code: 0, message: 'ok', data: { _id: addRes._id, inviteCode: createdInviteCode } }
   } catch (err) {
     console.error('[createGroup]', err)
     return { code: 500, message: '创建失败，请重试' }

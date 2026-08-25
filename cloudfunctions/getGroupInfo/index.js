@@ -10,17 +10,20 @@ exports.main = async (event) => {
   }
 
   try {
-    const groupRes = await db.collection('groups').where({ _id: groupId }).get()
-    if (groupRes.data.length === 0) {
-      return { code: 2, message: '群不存在' }
-    }
-    const group = groupRes.data[0]
-
     const memberRes = await db.collection('group_members')
       .where({ groupId, openid: OPENID })
       .get()
     const isMember = memberRes.data.length > 0
     const role = isMember ? memberRes.data[0].role : ''
+    if (!isMember) {
+      return { code: 3, message: '你不是该群成员' }
+    }
+
+    const groupRes = await db.collection('groups').where({ _id: groupId }).get()
+    if (groupRes.data.length === 0) {
+      return { code: 2, message: '群不存在' }
+    }
+    const group = groupRes.data[0]
 
     return {
       code: 0,

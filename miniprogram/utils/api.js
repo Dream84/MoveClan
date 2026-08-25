@@ -49,7 +49,15 @@ function getExt(filePath) {
   return m ? '.' + m[1].toLowerCase() : '.jpg'
 }
 
+function avatarSrc(url, size) {
+  if (!url) return ''
+  const thumb = `?imageMogr2/thumbnail/${size}x`
+  if (url.indexOf('cloud://') === 0) return url + thumb
+  return url
+}
+
 module.exports = {
   call,
-  uploadImage
+  uploadImage,
+  avatarSrc
 }

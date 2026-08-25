@@ -86,6 +86,13 @@ exports.main = async (event) => {
       return { code: 3, message: '无权编辑该记录' }
     }
 
+    const member = await db.collection('group_members')
+      .where({ groupId: v.groupId, openid: OPENID })
+      .count()
+    if (member.total === 0) {
+      return { code: 3, message: '你不是该群成员' }
+    }
+
     if (v.remark) {
       const r = await checkText(OPENID, v.remark)
       if (r === false) return { code: 4, message: '备注包含违规内容' }

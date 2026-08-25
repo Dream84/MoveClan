@@ -20,20 +20,26 @@ const COLLECTIONS = ['group_members', 'checkins']
 async function main() {
   for (const coll of COLLECTIONS) {
     let total = 0
+    const seen = new Set()
     while (true) {
       const res = await db.collection(coll)
         .where({ _openid: _.exists(false) })
         .limit(100)
         .get()
       if (!res.data.length) break
+      let changed = false
       for (const doc of res.data) {
+        if (seen.has(doc._id)) continue
+        seen.add(doc._id)
         if (doc.openid) {
           await db.collection(coll).doc(doc._id).update({
             data: { _openid: doc.openid }
           })
           total++
+          changed = true
         }
       }
+      if (!changed) break
     }
     console.log(`[backfill] ${coll} 回填 ${total} 条`)
   }
