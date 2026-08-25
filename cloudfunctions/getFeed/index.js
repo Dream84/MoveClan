@@ -4,7 +4,7 @@ const db = cloud.database()
 const _ = db.command
 
 function withThumb(url, size) {
-  if (!url || !(size > 0)) return url || ''
+  if (!url || !(size > 0) || url.indexOf('http') !== 0) return url || ''
   const qIdx = url.indexOf('?')
   if (qIdx >= 0) {
     return url.slice(0, qIdx) + `?imageMogr2/thumbnail/${size}x` + '&' + url.slice(qIdx + 1)
@@ -93,7 +93,7 @@ exports.main = async (event) => {
         _id: c._id,
         openid: c.openid,
         nickName: u.nickName || '用户',
-        avatarUrl: avatarMap[u.avatarUrl] || u.avatarUrl || '',
+        avatarUrl: avatarMap[u.avatarUrl] || '',
         checkDate: c.checkDate,
         createTime: c.createTime,
         sportType: c.sportType,
@@ -102,7 +102,7 @@ exports.main = async (event) => {
         count: c.count,
         remark: c.remark || '',
         imageUrl: imageMap[c.imageFileId] || '',
-        imageFullUrl: imageFullMap[c.imageFileId] || c.imageFileId || '',
+        imageFullUrl: imageFullMap[c.imageFileId] || imageMap[c.imageFileId] || '',
         likeCount: c.likeCount || 0,
         isLiked: (c.likeOpenids || []).indexOf(OPENID) >= 0,
         commentCount: (c.comments || []).length,

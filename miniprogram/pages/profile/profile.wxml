@@ -70,7 +70,7 @@
       <view class="modal-title">编辑资料</view>
       <button class="choose-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
         <image wx:if="{{editAvatarTemp}}" class="choose-avatar" src="{{editAvatarTemp}}" mode="aspectFill"></image>
-        <image wx:elif="{{editAvatarUrl}}" class="choose-avatar" src="{{editAvatarUrl}}?imageMogr2/thumbnail/200x" mode="aspectFill"></image>
+        <image wx:elif="{{editAvatarUrl}}" class="choose-avatar" src="{{editAvatarUrl}}" mode="aspectFill"></image>
         <view wx:else class="choose-avatar avatar-fallback">选</view>
         <view class="choose-tip">点击更换头像</view>
       </button>

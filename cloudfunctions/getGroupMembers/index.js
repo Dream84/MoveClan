@@ -7,7 +7,7 @@ const _ = db.command
 const cacheStore = new cache(60 * 1000)
 
 function withThumb(url) {
-  if (!url) return ''
+  if (!url || url.indexOf('http') !== 0) return url || ''
   const qIdx = url.indexOf('?')
   if (qIdx >= 0) {
     return url.slice(0, qIdx) + '?imageMogr2/thumbnail/200x' + '&' + url.slice(qIdx + 1)
@@ -31,7 +31,7 @@ async function resolveAvatarUrls(rows) {
   }
   return rows.map(r => ({
     ...r,
-    avatarUrl: withThumb(urlMap[r.avatarUrl] || r.avatarUrl || '')
+    avatarUrl: withThumb(urlMap[r.avatarUrl] || '')
   }))
 }
 

@@ -65,11 +65,10 @@ function friendlyError(name, err) {
   return (err && err.message) || '网络异常，请重试'
 }
 
-function avatarSrc(url, size) {
-  if (!url) return ''
-  const thumb = `?imageMogr2/thumbnail/${size}x`
-  if (url.indexOf('cloud://') === 0) return url + thumb
-  return url
+function avatarSrc(url) {
+  // 头像统一存为 cloud:// fileID，<image> 直接渲染最可靠；
+  // 不追加 imageMogr2 参数（cloud:// + 查询参数可能解析失败导致空白）
+  return url || ''
 }
 
 module.exports = {
