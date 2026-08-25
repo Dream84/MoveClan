@@ -15,6 +15,8 @@ module.exports = {
     { value: 'fitness', label: '健身' },
     { value: 'dance', label: '舞蹈' },
     { value: 'hiking', label: '徒步/爬山' },
+    { value: 'climbing', label: '爬坡' },
+    { value: 'stepper', label: '爬楼机' },
     { value: 'ball', label: '球类' },
     { value: 'other', label: '其他' }
   ],
@@ -45,6 +47,8 @@ module.exports = {
     fitness: 5.0,
     dance: 5.0,
     hiking: 5.3,
+    climbing: 7.0,
+    stepper: 8.8,
     ball: 7.3,
     other: 5.0
   },
@@ -83,6 +87,8 @@ module.exports = {
     fitness: '健身',
     dance: '舞蹈',
     hiking: '徒步/爬山',
+    climbing: '爬坡',
+    stepper: '爬楼机',
     ball: '球类',
     other: '其他'
   },
