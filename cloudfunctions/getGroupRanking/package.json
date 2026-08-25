@@ -4,7 +4,7 @@
   "description": "群排行榜实时聚合计算",
   "main": "index.js",
   "dependencies": {
-    "cache": "~2.3.2",
+    "cache": "~2.3.1",
     "wx-server-sdk": "~2.6.3"
   }
 }

@@ -4,7 +4,7 @@
   "description": "获取当前用户加入的群组列表（管理端读取）",
   "main": "index.js",
   "dependencies": {
-    "cache": "~2.3.2",
+    "cache": "~2.3.1",
     "wx-server-sdk": "~2.6.3"
   }
 }
