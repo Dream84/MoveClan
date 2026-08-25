@@ -33,6 +33,8 @@ MoveClan/
 2. 下载安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)。
 3. 用开发者工具「导入项目」，选择本目录 `MoveClan`，填入你的 AppID（暂未注册可先用测试号）。
 
+> **本地 Mock 预览（无需云环境/注册账号）**：`miniprogram/config.js` 中 `MOCK_ENABLED: true` 时，应用使用本地假数据（`miniprogram/utils/mock.js`），可在开发者工具「游客模式」下离线预览全部页面（登录/群/打卡/排行/统计/日历均有假数据）。联调真实云环境时请将 `MOCK_ENABLED` 置为 `false` 并填写 `CLOUD_ENV_ID`。
+
 ## 二、开通云开发并配置环境
 
 1. 工具栏点击「云开发」→ 开通云开发 → 创建环境（如 `moveclan-prod`），记下**环境 ID**。
