@@ -4,5 +4,9 @@
  */
 module.exports = {
   // 动态页每页条数（1-50），上滑触底自动加载下一页
-  FEED_PAGE_SIZE: 10
+  FEED_PAGE_SIZE: 10,
+
+  // 打卡图片压缩：wx.compressImage 质量（0-100）与最大宽度（像素，高度等比缩放）
+  CHECKIN_IMAGE_QUALITY: 80,
+  CHECKIN_IMAGE_MAX_WIDTH: 1280
 }

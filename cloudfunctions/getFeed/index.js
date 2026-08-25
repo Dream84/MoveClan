@@ -4,7 +4,7 @@ const db = cloud.database()
 const _ = db.command
 
 function withThumb(url, size) {
-  if (!url) return ''
+  if (!url || !(size > 0)) return url || ''
   const qIdx = url.indexOf('?')
   if (qIdx >= 0) {
     return url.slice(0, qIdx) + `?imageMogr2/thumbnail/${size}x` + '&' + url.slice(qIdx + 1)
@@ -77,10 +77,14 @@ exports.main = async (event) => {
       openids.map(id => (userMap[id] && userMap[id].avatarUrl) || '').filter(Boolean),
       200
     )
-    const imageMap = await resolveFileUrls(
+    const imageFullMap = await resolveFileUrls(
       rows.map(c => c.imageFileId || '').filter(Boolean),
-      320
+      0
     )
+    const imageMap = {}
+    Object.keys(imageFullMap).forEach(k => {
+      imageMap[k] = withThumb(imageFullMap[k], 320)
+    })
 
     const list = rows.map(c => {
       const u = userMap[c.openid] || {}
@@ -98,6 +102,7 @@ exports.main = async (event) => {
         count: c.count,
         remark: c.remark || '',
         imageUrl: imageMap[c.imageFileId] || '',
+        imageFullUrl: imageFullMap[c.imageFileId] || c.imageFileId || '',
         likeCount: c.likeCount || 0,
         isLiked: (c.likeOpenids || []).indexOf(OPENID) >= 0,
         commentCount: (c.comments || []).length,

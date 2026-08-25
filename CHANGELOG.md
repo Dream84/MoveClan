@@ -2,7 +2,20 @@
 
 本项目为微信小程序 + 云开发应用。每个版本条目列出「变更内容」与「重新部署需要进行的操作」。
 
-## v1.7.3 — 使用 logo.png 作为小程序 Logo（2026-08-25，工作区，待提交）
+## v1.7.4 — 打卡图片上传前压缩（2026-08-25，工作区，待提交）
+
+### 变更内容
+- 打卡图片选择已用 `wx.chooseMedia` 的 `sizeType:['compressed']`；在此基础上新增 `wx.compressImage` 硬压缩后再上传，显著减小存储与上传体积。
+- 新增功能配置（`miniprogram/settings.js`）：`CHECKIN_IMAGE_QUALITY`（质量，默认 80）、`CHECKIN_IMAGE_MAX_WIDTH`（最大宽度，默认 1280，高度等比）。
+- 压缩失败自动降级（去掉宽度限制重试 → 仍失败则上传原压缩件），不影响打卡。
+- 展示侧：动态列表只显示 320px 缩略图（`imageMogr2/thumbnail`），**点按预览时才加载原图**（`getFeed` 新增返回 `imageFullUrl` 原图链接），列表加载体积最小。
+
+### 重新部署需要进行的操作
+- **仅前端**：重新编译小程序即可。
+
+---
+
+## v1.7.3 — 使用 logo.png 作为小程序 Logo（2026-08-25，commit 0285e47）
 
 ### 变更内容
 - 小程序 Logo 原图存放于 `miniprogram/images/logo.png`（2043×2043 方形）。

@@ -41,7 +41,7 @@
 
         <view class="feed-body">
           <view class="feed-sport">🏃 {{item.sportLabel}} · {{item.duration}}分钟 · {{item.calories}}千卡</view>
-          <image wx:if="{{item.imageUrl}}" class="feed-img" src="{{item.imageUrl}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.imageUrl}}"></image>
+          <image wx:if="{{item.imageUrl}}" class="feed-img" src="{{item.imageUrl}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.imageFullUrl || item.imageUrl}}"></image>
           <view wx:if="{{item.remark}}" class="feed-remark">{{item.remark}}</view>
         </view>
 

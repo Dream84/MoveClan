@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
 const dateUtil = require('../../utils/date')
 const constants = require('../../utils/constants')
+const settings = require('../../settings')
 
 const app = getApp()
 
@@ -219,8 +220,27 @@ Page({
     if (!temp) return
     this.setData({ uploading: true, uploadProgress: 0 })
     try {
+      let src = temp
+      try {
+        const compressRes = await wx.compressImage({
+          src: temp,
+          quality: settings.CHECKIN_IMAGE_QUALITY,
+          compressedWidth: settings.CHECKIN_IMAGE_MAX_WIDTH
+        })
+        src = compressRes.tempFilePath
+      } catch (e1) {
+        try {
+          const compressRes2 = await wx.compressImage({
+            src: temp,
+            quality: settings.CHECKIN_IMAGE_QUALITY
+          })
+          src = compressRes2.tempFilePath
+        } catch (e2) {
+          console.error('[compressImage]', e2)
+        }
+      }
       const openid = app.globalData.openid
-      const res = await api.uploadImage(temp, openid, prog => {
+      const res = await api.uploadImage(src, openid, prog => {
         this.setData({ uploadProgress: prog.progress || 0 })
       })
       this.setData({
