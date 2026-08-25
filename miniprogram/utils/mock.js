@@ -111,10 +111,21 @@ function buildMockCheckins() {
         count: item.count,
         imageFileId: '',
         remark: '',
+        likeOpenids: [],
+        likeCount: 0,
+        comments: [],
         createTime: new Date(Date.now() - item.offset * 86400000)
       })
     })
   })
+  if (list.length >= 2) {
+    list[0].likeOpenids = ['mock2']
+    list[0].likeCount = 1
+    list[0].comments = [
+      { id: 'cm1', openid: 'mock2', nickName: '小明', avatarUrl: '', content: '太棒了，继续保持！', createTime: new Date(Date.now() - 3600 * 1000) },
+      { id: 'cm2', openid: 'mock3', nickName: '小红', avatarUrl: '', content: '明天我也要早起', createTime: new Date(Date.now() - 7200 * 1000) }
+    ]
+  }
   return list
 }
 
@@ -369,6 +380,68 @@ const handlers = {
   deleteCheckin({ checkinId }) {
     mockCheckins = mockCheckins.filter(c => c._id !== checkinId)
     return { code: 0, message: 'ok', data: {} }
+  },
+
+  getFeed({ groupId, page }) {
+    const p = Math.max(0, Number(page) || 0)
+    const rows = mockCheckins
+      .filter(c => c.groupId === groupId || !groupId)
+      .sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
+    const slice = rows.slice(p * 20, p * 20 + 20)
+    const list = slice.map(c => {
+      const u = userByOpenid(c.openid)
+      const comments = (c.comments || []).slice().sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
+      return {
+        _id: c._id,
+        openid: c.openid,
+        nickName: u.nickName,
+        avatarUrl: u.avatarUrl,
+        checkDate: c.checkDate,
+        createTime: c.createTime,
+        sportType: c.sportType,
+        duration: c.duration,
+        calories: c.calories,
+        count: c.count,
+        remark: c.remark || '',
+        imageUrl: '',
+        likeCount: c.likeCount || 0,
+        isLiked: (c.likeOpenids || []).indexOf(MOCK_OPENID) >= 0,
+        commentCount: (c.comments || []).length,
+        comments
+      }
+    })
+    return { code: 0, message: 'ok', data: { list, hasMore: rows.length > (p + 1) * 20, page: p } }
+  },
+
+  likeCheckin({ checkinId }) {
+    const c = mockCheckins.find(x => x._id === checkinId)
+    if (!c) return { code: 2, message: '动态不存在' }
+    const idx = (c.likeOpenids || []).indexOf(MOCK_OPENID)
+    if (idx >= 0) {
+      c.likeOpenids.splice(idx, 1)
+      c.likeCount = Math.max(0, (c.likeCount || 0) - 1)
+      return { code: 0, message: 'ok', data: { liked: false, likeCount: c.likeCount } }
+    }
+    c.likeOpenids = c.likeOpenids || []
+    c.likeOpenids.push(MOCK_OPENID)
+    c.likeCount = (c.likeCount || 0) + 1
+    return { code: 0, message: 'ok', data: { liked: true, likeCount: c.likeCount } }
+  },
+
+  commentCheckin({ checkinId, content }) {
+    const c = mockCheckins.find(x => x._id === checkinId)
+    if (!c) return { code: 2, message: '动态不存在' }
+    const comment = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      openid: MOCK_OPENID,
+      nickName: '本地测试',
+      avatarUrl: '',
+      content,
+      createTime: new Date()
+    }
+    c.comments = c.comments || []
+    c.comments.push(comment)
+    return { code: 0, message: 'ok', data: { comment } }
   }
 }
 

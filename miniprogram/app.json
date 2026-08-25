@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/feed/feed",
     "pages/ranking/ranking",
     "pages/groups/groups",
     "pages/profile/profile",
@@ -23,6 +24,10 @@
       {
         "pagePath": "pages/index/index",
         "text": "打卡"
+      },
+      {
+        "pagePath": "pages/feed/feed",
+        "text": "动态"
       },
       {
         "pagePath": "pages/ranking/ranking",

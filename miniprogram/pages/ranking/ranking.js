@@ -25,10 +25,15 @@ Page({
   },
 
   onShow() {
+    if (!app.throttleRefresh() && !this.data.loading) return
     this.init()
   },
 
   onPullDownRefresh() {
+    if (!app.throttleRefresh(true)) {
+      wx.stopPullDownRefresh()
+      return
+    }
     this.loadRanking(true).finally(() => wx.stopPullDownRefresh())
   },
 

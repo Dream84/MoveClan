@@ -16,6 +16,7 @@ Page({
   },
 
   onShow() {
+    if (!app.throttleRefresh() && !this.data.loading) return
     this.refresh()
   },
 

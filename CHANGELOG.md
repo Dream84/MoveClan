@@ -2,7 +2,28 @@
 
 本项目为微信小程序 + 云开发应用。每个版本条目列出「变更内容」与「重新部署需要进行的操作」。
 
-## v0.6.1 — 本地 Mock 预览层（2026-08-25，工作区，待提交）
+## v1.7.1 — 群动态 + 点赞 + 评论 + 刷新限频（2026-08-25，tag v1.7.1，合并原 v0.7.0/v0.7.1）
+
+### 变更内容
+- **新增「动态」Tab（第 2 个，位于「打卡」右侧）**：`pages/feed/feed`，按群展示成员打卡动态，时间倒序、上滑分页（每页 20 条）、下拉刷新、骨架屏、群选择器（保持所选群）、图片预览。
+- **新增云函数**：
+  - `getFeed`：分页拉取群动态，合并成员最新昵称/头像，头像/图片换临时链接缩略，返回点赞数、是否已赞、评论数与最新评论；
+  - `likeCheckin`：点赞/取消点赞（`likeOpenids` 原子 `addToSet`/`pull` + `likeCount` 增减）；
+  - `commentCheckin`：评论（≤200 字 + `msgSecCheck` 内容安全审核），存 `{id, openid, nickName, avatarUrl, content, createTime}` 快照。
+- **数据模型**：`checkins` 内嵌 `likeOpenids`、`likeCount`、`comments`；新增索引 `(groupId, createTime)`。
+- **前端交互**：点赞乐观更新 + 失败回滚；评论展示最新 5 条 + 「查看全部 N 条」展开；底部评论输入栏。
+- **刷新限频**：`app.js` 新增 `throttleRefresh()`（全局滑动窗口，1 分钟内最多 10 次数据刷新）；首页/动态/排行/群组/我的/群详情接入（`onShow` 已有数据时限频、首次加载不受限；下拉刷新超频提示），打卡表单页不参与。
+- **Mock**：`utils/mock.js` 补充 `getFeed`/`likeCheckin`/`commentCheckin`，游客模式可预览互动。
+
+### 重新部署需要进行的操作
+1. **云函数**（云端安装依赖）：新增 `getFeed`、`likeCheckin`、`commentCheckin`
+2. **数据库**：`checkins` 新建索引 `(groupId, createTime)`
+3. **前端**：重新编译小程序（新增「动态」Tab + 刷新限频）
+4. 审核前在「用户隐私保护指引」补充说明收集「评论内容」
+
+---
+
+## v0.6.1 — 本地 Mock 预览层（2026-08-25，commit 980267d）
 
 ### 变更内容
 - 新增 `miniprogram/utils/mock.js` 本地 Mock 层：`config.js` 中 `MOCK_ENABLED: true` 时，不连接云环境，`wx.cloud` 全部替换为内存假数据（登录/群列表/打卡/排行/统计/日历/上传）。
@@ -49,7 +70,7 @@
 
 ---
 
-## v0.5.0 — 科学估算 + 骨架屏 + 缓存/下拉刷新（2026-08-25，commit 5293b58，含 v0.4.1 内容）
+## v0.5.0 — 科学估算 + 骨架屏 + 缓存/下拉刷新（2026-08-25，commit 5293b58，原 v0.4.1 内容已并入本版本）
 
 ### 变更内容
 - **科学估算公式（默认隐藏）**：卡路里估算公式 `消耗热量(千卡) = MET值 × 体重(公斤) × 时长(小时)` 默认不展示；卡路里输入框旁有「?」图标，点击后展开显示公式与当前运动 MET。
@@ -58,30 +79,15 @@
 - **更多运动类型**：运动类型扩充至 17 种，新增「减脂操、羽毛球、篮球、足球、乒乓球、拳击、举铁、舞蹈、徒步/爬山」，骑行改名为「骑行/单车」，含游泳。
 - **MET 值本地常量**：`miniprogram/utils/constants.js` 的 `MET_VALUES` 表（前端本地维护）。
 - **云函数同步**：`submitCheckin` / `updateCheckin` 的运动类型白名单同步扩充到 17 种。
+- **加载态优化**：修复「加载中却显示无数据」（空状态加 `loading` 门控）；新增全局骨架屏动画（`.sk-block`/`.sk-circle`），各列表加载时展示骨架占位。
+- **60 秒数据缓存**：`getMyStats`、`getGroupMembers` 新增与排行榜一致的 60 秒内存缓存（`cache` 包），切换页面不再重复查库。
+- **下拉刷新强制更新**：排行/统计/成员接口支持 `refresh` 参数绕过缓存；首页/排行/我的/群详情下拉刷新传入 `refresh:true`；打卡后成就检测强制刷新。
+- **群详情并行加载**：`getGroupInfo` 与 `getGroupMembers` 改为 `Promise.all` 并行请求。
 
 ### 重新部署需要进行的操作
 1. **云函数**（云端安装依赖）：`login`、`submitCheckin`、`updateCheckin`
 2. **前端**：重新编译小程序。
 3. 无需数据库变更（`weightKg` 为新增可选字段，旧记录无此字段时按未填写处理）。
-
----
-
-## v0.4.1 — 加载态优化 + 数据缓存与下拉刷新（工作区，待提交）
-
-### 变更内容
-- **修复「加载中却显示无数据」**：各页面空状态提示均增加 `loading` 门控，加载完成前不再误显示「无数据/0」。
-- **骨架屏动画**：新增全局 `.sk-block`/`.sk-circle` 骨架屏样式（微光扫过动画），首页（本周概览、最近打卡）、排行页、群组页、我的页（统计）、群详情（成员列表）在加载时展示骨架占位。
-- **60 秒数据缓存**：`getMyStats`、`getGroupMembers` 新增与排行榜一致的 60 秒内存缓存（`cache` 包），切换页面重复进入不再重复查库。
-- **下拉刷新强制更新**：排行/统计/成员接口支持 `refresh` 参数绕过缓存；首页、排行页、我的页、群详情页的下拉刷新均传入 `refresh:true` 获取最新数据。
-- **打卡成就检查强制刷新**：提交打卡后的成就检测传 `refresh:true`，避免命中旧缓存导致成就弹窗不触发。
-- **群详情并行加载**：`getGroupInfo` 与 `getGroupMembers` 改为 `Promise.all` 并行请求。
-
-### 重新部署需要进行的操作
-1. **云函数**（云端安装依赖）：
-   - `getMyStats`（新增 `cache` 依赖，必须云端安装依赖）
-   - `getGroupMembers`（新增 `cache` 依赖，必须云端安装依赖）
-   - `getGroupRanking`（支持 `refresh`，建议一并重部署）
-2. **前端**：重新编译小程序。
 
 ---
 
@@ -163,14 +169,14 @@
 
 ---
 
-## 当前累计待部署清单（v0.6.0 全部落地后）
+## 当前累计待部署清单（v1.7.1 全部落地后）
 
 | 动作 | 对象 |
 |---|---|
-| 新增云函数（云端安装依赖） | `getMyGroups`（含 cache 依赖）、`updateGroup` |
+| 新增云函数（云端安装依赖） | `getMyGroups`、`updateGroup`、`getFeed`、`likeCheckin`、`commentCheckin` |
 | 重新部署云函数（云端安装依赖） | `login`、`createGroup`、`joinGroup`、`submitCheckin`、`updateCheckin`、`dismissGroup`、`leaveGroup`、`removeMember`、`getGroupRanking`、`getGroupMembers`、`getMyStats`、`getGroupInfo` |
-| 数据库配置 | `groups` 权限改「仅管理端可读写」；`checkins` 建索引 `(groupId, openid, checkDate)` |
+| 数据库配置 | `groups` 权限改「仅管理端可读写」；`checkins` 建索引 `(groupId, openid, checkDate)`、`(groupId, createTime)` |
 | 存量数据回填 | `group_members` / `checkins` 补 `_openid`（如环境中有旧数据） |
-| 重新编译前端 | 全部页面 |
+| 重新编译前端 | 全部页面（含新「动态」Tab） |
 
 > 未改动无需重部署的云函数：`deleteCheckin`。

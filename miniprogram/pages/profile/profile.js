@@ -30,10 +30,15 @@ Page({
   },
 
   onShow() {
+    if (!app.throttleRefresh() && this.data.statsLoaded) return
     this.refresh()
   },
 
   onPullDownRefresh() {
+    if (!app.throttleRefresh(true)) {
+      wx.stopPullDownRefresh()
+      return
+    }
     this.refresh(true).finally(() => wx.stopPullDownRefresh())
   },
 

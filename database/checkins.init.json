@@ -27,6 +27,14 @@
         { "field": "checkDate", "order": "desc" }
       ],
       "unique": false
+    },
+    {
+      "name": "groupId_createTime",
+      "fields": [
+        { "field": "groupId", "order": "asc" },
+        { "field": "createTime", "order": "desc" }
+      ],
+      "unique": false
     }
   ],
   "sampleDocs": [
@@ -42,9 +50,21 @@
       "count": 1,
       "imageFileId": "cloud://env-id.656e-env-id-1300000000/checkins/xxx.jpg",
       "remark": "晨跑 5 公里，状态不错",
+      "likeOpenids": ["oYOUR_OPENID_HERE"],
+      "likeCount": 1,
+      "comments": [
+        {
+          "id": "example_comment",
+          "openid": "oOTHER_OPENID",
+          "nickName": "小明",
+          "avatarUrl": "https://thirdwx.qlogo.cn/mmopen/example/132",
+          "content": "太棒了！",
+          "createTime": { "$date": 1756041600000 }
+        }
+      ],
       "createTime": { "$date": 1756041600000 },
       "updateTime": { "$date": 1756041600000 }
     }
   ],
-  "note": "权限选择「仅创建者可读写」，排行榜/统计聚合全部走云函数。创建复合索引：排行榜聚合用 (groupId, checkDate)，个人统计用 (openid, checkDate)，首页最近打卡分页用 (groupId, openid, checkDate)。"
+  "note": "权限选择「仅创建者可读写」，排行榜/统计聚合与动态列表全部走云函数。创建复合索引：排行榜聚合用 (groupId, checkDate)，个人统计用 (openid, checkDate)，首页最近打卡分页用 (groupId, openid, checkDate)，动态列表用 (groupId, createTime)。点赞/评论为可选内嵌字段（likeOpenids/likeCount/comments），未启用时可不填。"
 }

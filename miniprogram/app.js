@@ -95,5 +95,20 @@ App({
 
   invalidateMyGroups() {
     this.globalData.myGroups = null
+  },
+
+  throttleRefresh(showToast) {
+    const now = Date.now()
+    const WINDOW = 60 * 1000
+    const LIMIT = 10
+    this._refreshTimes = (this._refreshTimes || []).filter(t => now - t < WINDOW)
+    if (this._refreshTimes.length >= LIMIT) {
+      if (showToast) {
+        wx.showToast({ title: '操作太频繁，请稍后再试', icon: 'none' })
+      }
+      return false
+    }
+    this._refreshTimes.push(now)
+    return true
   }
 })

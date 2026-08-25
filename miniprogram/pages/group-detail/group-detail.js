@@ -21,10 +21,15 @@ Page({
   },
 
   onShow() {
+    if (!app.throttleRefresh() && !this.data.loading) return
     this.loadDetail()
   },
 
   onPullDownRefresh() {
+    if (!app.throttleRefresh(true)) {
+      wx.stopPullDownRefresh()
+      return
+    }
     this.loadDetail(true).finally(() => wx.stopPullDownRefresh())
   },
 

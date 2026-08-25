@@ -1,0 +1,9 @@
+{
+  "name": "commentCheckin",
+  "version": "1.0.0",
+  "description": "评论打卡动态（含内容安全审核）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

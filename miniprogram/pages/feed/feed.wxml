@@ -1,0 +1,90 @@
+<view class="page">
+  <picker wx:if="{{groups.length > 1}}" mode="selector" range="{{groups}}" range-key="name" value="{{groupIndex}}" bindchange="onGroupChange">
+    <view class="group-select">
+      <text class="group-select-name">{{currentGroup.name}}</text>
+      <text class="group-select-arrow">▾</text>
+    </view>
+  </picker>
+
+  <view wx:if="{{!loading && !currentGroup}}" class="empty-tip">
+    加入运动群后即可查看群动态
+    <view class="btn-ghost goto-btn" bindtap="goGroups">去群组</view>
+  </view>
+
+  <view wx:if="{{currentGroup}}" class="feed-list">
+    <view wx:if="{{loading}}" class="feed-card card" wx:for="{{[1, 2, 3]}}" wx:key="*this">
+      <view class="feed-head">
+        <view class="sk-circle feed-avatar-sk"></view>
+        <view class="feed-head-text">
+          <view class="sk-block sk-line"></view>
+          <view class="sk-block sk-line-short"></view>
+        </view>
+      </view>
+      <view class="sk-block sk-line feed-sport-sk"></view>
+    </view>
+    <view wx:elif="{{!list.length}}" class="empty-tip">还没有动态，快去打第一卡吧</view>
+    <block wx:else>
+      <view class="feed-card card" wx:for="{{list}}" wx:key="_id" wx:for-item="item" wx:for-index="idx">
+        <view class="feed-head">
+          <view class="feed-avatar-wrap">
+            <image wx:if="{{item.avatarUrl}}" class="feed-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+            <view wx:else class="feed-avatar avatar-fallback">{{item.nickName[0]}}</view>
+          </view>
+          <view class="feed-head-text">
+            <view class="feed-name">
+              {{item.nickName}}
+              <text wx:if="{{item.isMe}}" class="me-tag">我</text>
+            </view>
+            <view class="feed-date">{{item.checkDate}}</view>
+          </view>
+        </view>
+
+        <view class="feed-body">
+          <view class="feed-sport">🏃 {{item.sportLabel}} · {{item.duration}}分钟 · {{item.calories}}千卡</view>
+          <image wx:if="{{item.imageUrl}}" class="feed-img" src="{{item.imageUrl}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.imageUrl}}"></image>
+          <view wx:if="{{item.remark}}" class="feed-remark">{{item.remark}}</view>
+        </view>
+
+        <view class="feed-actions">
+          <view class="action {{item.isLiked ? 'liked' : ''}}" data-index="{{idx}}" bindtap="toggleLike">
+            <text class="action-icon">{{item.isLiked ? '❤️' : '🤍'}}</text>
+            <text>{{item.likeCount}}</text>
+          </view>
+          <view class="action" data-index="{{idx}}" bindtap="openComment">
+            <text class="action-icon">💬</text>
+            <text>{{item.commentCount}}</text>
+          </view>
+        </view>
+
+        <view class="feed-comments" wx:if="{{item.comments.length}}">
+          <view class="comment" wx:for="{{item.expanded ? item.comments : item.comments.slice(0, 5)}}" wx:key="id" wx:for-item="cm">
+            <text class="cm-name">{{cm.nickName}}：</text>
+            <text class="cm-content">{{cm.content}}</text>
+          </view>
+          <view wx:if="{{item.commentCount > 5 && !item.expanded}}" class="show-all" data-index="{{idx}}" bindtap="expandComments">
+            查看全部 {{item.commentCount}} 条
+          </view>
+        </view>
+      </view>
+      <view class="feed-footer">
+        <text wx:if="{{feedLoading}}">加载中...</text>
+        <text wx:elif="{{hasMore}}">上拉加载更多</text>
+        <text wx:else>没有更多了</text>
+      </view>
+    </block>
+  </view>
+
+  <view class="comment-bar" wx:if="{{commentTarget}}">
+    <input
+      class="comment-input"
+      placeholder="说点什么…"
+      maxlength="200"
+      value="{{commentText}}"
+      bindinput="onCommentInput"
+      confirm-type="send"
+      bindconfirm="submitComment"
+    />
+    <button class="comment-send" bindtap="submitComment">发送</button>
+    <view class="comment-close" bindtap="closeComment">✕</view>
+  </view>
+</view>

@@ -1,0 +1,9 @@
+{
+  "name": "getFeed",
+  "version": "1.0.0",
+  "description": "群动态分页列表（含点赞/评论信息）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
