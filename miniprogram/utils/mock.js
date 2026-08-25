@@ -382,12 +382,13 @@ const handlers = {
     return { code: 0, message: 'ok', data: {} }
   },
 
-  getFeed({ groupId, page }) {
+  getFeed({ groupId, page, pageSize }) {
     const p = Math.max(0, Number(page) || 0)
+    const size = Math.min(50, Math.max(1, Number(pageSize) || 10))
     const rows = mockCheckins
       .filter(c => c.groupId === groupId || !groupId)
       .sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
-    const slice = rows.slice(p * 20, p * 20 + 20)
+    const slice = rows.slice(p * size, p * size + size)
     const list = slice.map(c => {
       const u = userByOpenid(c.openid)
       const comments = (c.comments || []).slice().sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
@@ -410,7 +411,7 @@ const handlers = {
         comments
       }
     })
-    return { code: 0, message: 'ok', data: { list, hasMore: rows.length > (p + 1) * 20, page: p } }
+    return { code: 0, message: 'ok', data: { list, hasMore: rows.length > (p + 1) * size, page: p } }
   },
 
   likeCheckin({ checkinId }) {

@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const constants = require('../../utils/constants')
+const settings = require('../../settings')
 
 const app = getApp()
 
@@ -84,7 +85,7 @@ Page({
     const reqId = ++this._feedReqId
     const reqGroupId = group._id
     this.setData({ feedLoading: true })
-    return api.call('getFeed', { groupId: reqGroupId, page, refresh: !!reset }, { loading: false })
+    return api.call('getFeed', { groupId: reqGroupId, page, pageSize: settings.FEED_PAGE_SIZE, refresh: !!reset }, { loading: false })
       .then(data => {
         if (reqId !== this._feedReqId || !this.data.currentGroup || this.data.currentGroup._id !== reqGroupId) return
         const rows = (data.list || []).map(item => ({

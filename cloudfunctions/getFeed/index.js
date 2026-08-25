@@ -3,8 +3,6 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 
-const PAGE_SIZE = 20
-
 function withThumb(url, size) {
   if (!url) return ''
   const qIdx = url.indexOf('?')
@@ -45,6 +43,7 @@ exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
   const page = Math.max(0, Number(event.page) || 0)
+  const pageSize = Math.min(50, Math.max(1, Number(event.pageSize) || 10))
   if (!groupId) {
     return { code: 1, message: '参数错误' }
   }
@@ -60,8 +59,8 @@ exports.main = async (event) => {
     const res = await db.collection('checkins')
       .where({ groupId })
       .orderBy('createTime', 'desc')
-      .skip(page * PAGE_SIZE)
-      .limit(PAGE_SIZE)
+      .skip(page * pageSize)
+      .limit(pageSize)
       .get()
     const rows = res.data || []
 
@@ -111,7 +110,7 @@ exports.main = async (event) => {
       message: 'ok',
       data: {
         list,
-        hasMore: rows.length === PAGE_SIZE,
+        hasMore: rows.length === pageSize,
         page
       }
     }
