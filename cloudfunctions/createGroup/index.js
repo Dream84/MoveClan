@@ -32,7 +32,7 @@ exports.main = async (event) => {
   try {
     const userRes = await db.collection('users').where({ openid: OPENID }).get()
     const user = userRes.data[0]
-    const nickName = user ? user.nickName : '微信用户'
+    const nickName = user ? user.nickName : '用户'
     const avatarUrl = user ? user.avatarUrl : ''
 
     let addRes = null

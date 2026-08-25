@@ -40,7 +40,7 @@ exports.main = async (event) => {
         openid: OPENID,
         role: 'member',
         joinTime: db.serverDate(),
-        nickName: user ? user.nickName : '微信用户',
+        nickName: user ? user.nickName : '用户',
         avatarUrl: user ? user.avatarUrl : ''
       }
     })

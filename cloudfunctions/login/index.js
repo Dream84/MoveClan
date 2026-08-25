@@ -11,6 +11,10 @@ async function syncMembership(openid, nickName, avatarUrl) {
   }
 }
 
+function defaultName() {
+  return '用户' + Math.random().toString(36).slice(2, 8)
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   if (!OPENID) {
@@ -26,7 +30,7 @@ exports.main = async (event) => {
     const res = await users.where({ openid: OPENID }).get()
 
     if (res.data.length === 0) {
-      const effectiveNick = nickName || '微信用户'
+      const effectiveNick = nickName || defaultName()
       const effectiveAvatar = avatarUrl || ''
       const addRes = await users.add({
         data: {

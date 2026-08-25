@@ -133,7 +133,7 @@ exports.main = async (event) => {
       const userRes = await db.collection('users').where({ openid: _.in(openids) }).get()
       userRes.data.forEach(u => {
         if (u.openid) {
-          userMap[u.openid] = { nickName: u.nickName || '微信用户', avatarUrl: u.avatarUrl || '' }
+          userMap[u.openid] = { nickName: u.nickName || '用户', avatarUrl: u.avatarUrl || '' }
         }
       })
     }
@@ -160,7 +160,7 @@ exports.main = async (event) => {
 
     const list = Object.keys(agg).map(openid => ({
       openid,
-      nickName: (userMap[openid] && userMap[openid].nickName) || '微信用户',
+      nickName: (userMap[openid] && userMap[openid].nickName) || '用户',
       avatarUrl: (userMap[openid] && userMap[openid].avatarUrl) || '',
       count: agg[openid].count,
       totalCalories: Math.round(agg[openid].totalCalories),

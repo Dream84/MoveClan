@@ -57,7 +57,7 @@ exports.main = async (event) => {
     const comment = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       openid: OPENID,
-      nickName: user ? user.nickName : '微信用户',
+      nickName: user ? user.nickName : '用户',
       avatarUrl: user ? user.avatarUrl : '',
       content,
       createTime: db.serverDate()

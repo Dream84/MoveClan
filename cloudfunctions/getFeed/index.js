@@ -92,7 +92,7 @@ exports.main = async (event) => {
       return {
         _id: c._id,
         openid: c.openid,
-        nickName: u.nickName || '微信用户',
+        nickName: u.nickName || '用户',
         avatarUrl: avatarMap[u.avatarUrl] || u.avatarUrl || '',
         checkDate: c.checkDate,
         createTime: c.createTime,

@@ -5,12 +5,12 @@
       <view wx:else class="avatar avatar-fallback">{{userInfo.nickName ? userInfo.nickName[0] : '跃'}}</view>
     </view>
     <view class="header-text">
-      <view class="greeting">{{greeting}}，{{userInfo.nickName || '微信用户'}}</view>
+      <view class="greeting">{{greeting}}，{{userInfo.nickName || '用户'}}</view>
       <view class="slogan">今天也动起来吧 💪</view>
     </view>
   </view>
 
-  <view class="profile-tip card" wx:if="{{userInfo && !userInfo.avatarUrl}}">
+  <view class="profile-tip card" wx:if="{{showProfileTip}}">
     <view class="profile-tip-text">
       <view class="profile-tip-title">设置头像昵称</view>
       <view class="profile-tip-sub">一键使用微信昵称和头像作为默认资料</view>

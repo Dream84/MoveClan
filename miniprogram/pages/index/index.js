@@ -15,10 +15,17 @@ function greeting() {
   return '晚上好'
 }
 
+function isDefaultProfile(userInfo) {
+  if (!userInfo) return false
+  const nick = userInfo.nickName || ''
+  return !userInfo.avatarUrl || nick === '微信用户' || nick.indexOf('用户') === 0
+}
+
 Page({
   data: {
     userInfo: null,
     avatarDisplay: '',
+    showProfileTip: false,
     greeting: '',
     groups: [],
     groupIndex: 0,
@@ -59,6 +66,7 @@ Page({
       this.setData({
         userInfo: app.globalData.userInfo,
         avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
+        showProfileTip: isDefaultProfile(app.globalData.userInfo),
         greeting: greeting()
       })
       await this.loadGroups(!!pull)
@@ -191,7 +199,8 @@ Page({
       app.setUserInfo(user)
       this.setData({
         userInfo: user,
-        avatarDisplay: api.avatarSrc(user.avatarUrl, 200)
+        avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
+        showProfileTip: false
       })
       wx.showToast({ title: '已使用微信资料', icon: 'success' })
     } catch (err) {
