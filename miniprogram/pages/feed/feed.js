@@ -17,7 +17,8 @@ Page({
     feedLoading: false,
     myOpenid: '',
     commentTarget: null,
-    commentText: ''
+    commentText: '',
+    commentFocus: false
   },
 
   onLoad() {
@@ -153,16 +154,29 @@ Page({
     const index = e.currentTarget.dataset.index
     const item = this.data.list[index]
     if (!item) return
-    this.setData({ commentTarget: item, commentText: '' })
+    this.setData({ commentTarget: item, commentText: '', commentFocus: false })
     this.hideTab()
+    setTimeout(() => {
+      this.setData({ commentFocus: true })
+    }, 120)
   },
 
   onCommentInput(e) {
     this.setData({ commentText: e.detail.value })
   },
 
+  onCommentBlur() {
+    // 输入法框关闭（失焦）时自动取消评论栏；留 200ms 让「发送」点击先执行
+    setTimeout(() => {
+      if (this.data.commentTarget) {
+        this.setData({ commentTarget: null, commentText: '', commentFocus: false })
+        this.showTab()
+      }
+    }, 200)
+  },
+
   closeComment() {
-    this.setData({ commentTarget: null, commentText: '' })
+    this.setData({ commentTarget: null, commentText: '', commentFocus: false })
     this.showTab()
   },
 
@@ -207,7 +221,7 @@ Page({
           }, 150)
         }
       }
-      this.setData({ commentTarget: null, commentText: '' })
+      this.setData({ commentTarget: null, commentText: '', commentFocus: false })
       this.showTab()
     } catch (err) {
       console.error('[feed.comment]', err)

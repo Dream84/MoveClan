@@ -84,7 +84,9 @@
       placeholder="说点什么…"
       maxlength="200"
       value="{{commentText}}"
+      focus="{{commentFocus}}"
       bindinput="onCommentInput"
+      bindblur="onCommentBlur"
       confirm-type="send"
       bindconfirm="submitComment"
     />
