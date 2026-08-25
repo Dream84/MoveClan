@@ -92,7 +92,8 @@ Page({
           ...item,
           sportLabel: constants.sportLabel(item.sportType),
           isMe: item.openid === this.data.myOpenid,
-          expanded: false
+          expanded: false,
+          commentList: item.comments || []
         }))
         this.setData({
           list: reset ? rows : this.data.list.concat(rows),
@@ -174,11 +175,14 @@ Page({
       if (res && res.comment) {
         const idx = this.data.list.findIndex(x => x._id === item._id)
         if (idx >= 0) {
-          const newComments = [res.comment].concat(this.data.list[idx].comments || [])
+          const newComments = [res.comment].concat(this.data.list[idx].commentList || [])
           this.setData({
-            [`list[${idx}].comments`]: newComments,
+            [`list[${idx}].commentList`]: newComments,
             [`list[${idx}].commentCount`]: newComments.length
           })
+          setTimeout(() => {
+            wx.pageScrollTo({ selector: `#feed-${item._id}`, duration: 300 })
+          }, 150)
         }
       }
       this.setData({ commentTarget: null, commentText: '' })

@@ -26,7 +26,7 @@
     </block>
     <view wx:elif="{{!list.length}}" class="empty-tip">还没有动态，快去打第一卡吧</view>
     <block wx:else>
-      <view class="feed-card card" wx:for="{{list}}" wx:key="_id" wx:for-item="item" wx:for-index="idx">
+      <view class="feed-card card" id="feed-{{item._id}}" wx:for="{{list}}" wx:key="_id" wx:for-item="item" wx:for-index="idx">
         <view class="feed-head">
           <view class="feed-avatar-wrap">
             <image wx:if="{{item.avatarUrl}}" class="feed-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
@@ -58,13 +58,15 @@
           </view>
         </view>
 
-        <view class="feed-comments" wx:if="{{item.comments.length}}">
-          <view class="comment" wx:for="{{item.expanded ? item.comments : item.comments.slice(0, 5)}}" wx:key="id" wx:for-item="cm">
-            <text class="cm-name">{{cm.nickName}}：</text>
-            <text class="cm-content">{{cm.content}}</text>
+        <view class="feed-comments" wx:if="{{item.commentList.length}}">
+          <view class="comment" wx:for="{{item.commentList}}" wx:key="id" wx:for-item="cm" wx:for-index="ci">
+            <block wx:if="{{item.expanded || ci < 5}}">
+              <text class="cm-name">{{cm.nickName}}：</text>
+              <text class="cm-content">{{cm.content}}</text>
+            </block>
           </view>
-          <view wx:if="{{item.commentCount > 5 && !item.expanded}}" class="show-all" data-index="{{idx}}" bindtap="expandComments">
-            查看全部 {{item.commentCount}} 条
+          <view wx:if="{{item.commentList.length > 5 && !item.expanded}}" class="show-all" data-index="{{idx}}" bindtap="expandComments">
+            查看全部 {{item.commentList.length}} 条
           </view>
         </view>
       </view>
@@ -86,7 +88,7 @@
       confirm-type="send"
       bindconfirm="submitComment"
     />
-    <button class="comment-send" bindtap="submitComment">发送</button>
+    <view class="comment-send {{commentText ? 'active' : ''}}" bindtap="submitComment">发送</view>
     <view class="comment-close" bindtap="closeComment">✕</view>
   </view>
 </view>
