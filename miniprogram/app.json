@@ -23,23 +23,33 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "打卡"
+        "text": "打卡",
+        "iconPath": "images/tab-checkin.png",
+        "selectedIconPath": "images/tab-checkin-active.png"
       },
       {
         "pagePath": "pages/feed/feed",
-        "text": "动态"
+        "text": "动态",
+        "iconPath": "images/tab-feed.png",
+        "selectedIconPath": "images/tab-feed-active.png"
       },
       {
         "pagePath": "pages/ranking/ranking",
-        "text": "排行"
+        "text": "排行",
+        "iconPath": "images/tab-ranking.png",
+        "selectedIconPath": "images/tab-ranking-active.png"
       },
       {
         "pagePath": "pages/groups/groups",
-        "text": "群组"
+        "text": "群组",
+        "iconPath": "images/tab-groups.png",
+        "selectedIconPath": "images/tab-groups-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png"
       }
     ]
   },

@@ -1,7 +1,17 @@
 # MoveClan（跃动圈）运动打卡小程序
 
+<p align="center">
+  <img src="miniprogram/images/logo.png" alt="MoveClan 跃动圈 Logo" width="160" />
+</p>
+
 面向微信群的轻量级运动打卡工具：群成员记录每日运动数据，查看周/月排行榜相互激励。
 技术栈：微信小程序原生框架 + 微信云开发（CloudBase）。
+
+## 小程序 Logo
+
+- 原图存放于 `miniprogram/images/logo.png`（2043×2043 方形）。
+- **底部 TabBar 图标**：已由 `logo.png` 生成到 `miniprogram/images/`（81×81，普通灰度版 + 选中彩色版，共 10 个），`app.json` 已引用。
+- **微信端「小程序头像/Logo」**：需在 [微信公众平台](https://mp.weixin.qq.com/)「设置 → 基本设置 → 小程序头像」上传（建议上传 144×144 的方形图，可裁剪自 `logo.png`），代码无法自动设置。
 
 ## 目录结构
 
@@ -11,9 +21,12 @@ MoveClan/
 ├── miniprogram/                # 小程序前端
 │   ├── app.js / app.json / app.wxss
 │   ├── config.js               # ★ 云环境 ID 等配置（部署时必改）
-│   ├── utils/                  # 常量、日期工具、云函数调用封装
+│   ├── settings.js             # 功能类配置项（如动态分页条数）
+│   ├── images/                  # TabBar 图标 + 小程序 Logo 原图（logo.png）
+│   ├── utils/                  # 常量、日期工具、云函数调用封装、Mock 层
 │   ├── pages/
 │   │   ├── index/              # 首页（打卡入口 + 本周概览 + 最近记录）
+│   │   ├── feed/               # 动态页（群动态 + 点赞 + 评论）
 │   │   ├── ranking/            # 排行页（周/月 × 次数/卡路里/时长）
 │   │   ├── groups/             # 群组页（创建/加入/列表）
 │   │   ├── group-detail/       # 群详情（成员/邀请码/退出）
