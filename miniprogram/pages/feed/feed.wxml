@@ -37,7 +37,7 @@
               {{item.nickName}}
               <text wx:if="{{item.isMe}}" class="me-tag">我</text>
             </view>
-            <view class="feed-date">{{item.checkDate}}</view>
+            <view class="feed-date">{{item.timeLabel}}</view>
           </view>
         </view>
 

@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
 const constants = require('../../utils/constants')
 const settings = require('../../settings')
+const dateUtil = require('../../utils/date')
 
 const app = getApp()
 
@@ -98,7 +99,8 @@ Page({
           sportLabel: constants.sportLabel(item.sportType),
           isMe: item.openid === this.data.myOpenid,
           expanded: false,
-          commentList: item.comments || []
+          commentList: item.comments || [],
+          timeLabel: dateUtil.formatDateTime(item.createTime)
         }))
         this.setData({
           list: reset ? rows : this.data.list.concat(rows),

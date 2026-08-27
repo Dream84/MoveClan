@@ -89,7 +89,7 @@
                 {{item.sportLabel}}
                 <text class="recent-count" wx:if="{{item.count > 1}}">x{{item.count}}</text>
               </view>
-              <view class="recent-meta">{{item.checkDate}}</view>
+              <view class="recent-meta">{{item.showTime}}</view>
             </view>
             <view class="recent-stats">
               <text class="recent-dur">{{item.duration}}分钟</text>

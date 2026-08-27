@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const constants = require('../../utils/constants')
+const dateUtil = require('../../utils/date')
 
 const app = getApp()
 
@@ -139,6 +140,7 @@ Page({
         duration: c.duration,
         calories: c.calories,
         checkDate: c.checkDate,
+        showTime: dateUtil.formatDateTime(c.createTime),
         count: c.count,
         hasImage: !!c.imageFileId
       }))

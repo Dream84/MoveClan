@@ -60,6 +60,15 @@ function isValidDateRange(dateStr) {
   return !isNaN(d.getTime()) && formatDate(d) === dateStr
 }
 
+function formatDateTime(value) {
+  if (value === undefined || value === null || value === '') return ''
+  const d = value instanceof Date ? value : new Date(value)
+  if (isNaN(d.getTime())) return ''
+  const bj = new Date(d.getTime() + 8 * 3600 * 1000)
+  return `${bj.getUTCFullYear()}-${pad(bj.getUTCMonth() + 1)}-${pad(bj.getUTCDate())} ` +
+    `${pad(bj.getUTCHours())}:${pad(bj.getUTCMinutes())}:${pad(bj.getUTCSeconds())}`
+}
+
 module.exports = {
   pad,
   formatDate,
@@ -70,5 +79,6 @@ module.exports = {
   getWeekRange,
   getMonthRange,
   getMonthDays,
-  isValidDateRange
+  isValidDateRange,
+  formatDateTime
 }
