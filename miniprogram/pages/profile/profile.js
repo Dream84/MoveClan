@@ -21,7 +21,6 @@ Page({
     calMonth: new Date().getMonth() + 1,
     calValue: [],
     statsLoaded: false,
-    subscribeEnabled: false,
     showEdit: false,
     editAvatarUrl: '',
     editAvatarTemp: '',
@@ -49,8 +48,7 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
-        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
-        subscribeEnabled: wx.getStorageSync('subscribeEnabled') || false
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200)
       })
       await this.loadStats(!!pull)
     } catch (err) {
@@ -171,34 +169,6 @@ Page({
       console.error('[profile.saveProfile]', err)
     } finally {
       wx.hideLoading()
-    }
-  },
-
-  onSubSwitch(e) {
-    const enabled = e.detail.value
-    if (enabled) {
-      const tid = app.globalData.subscribeTemplateId
-      if (!tid) {
-        wx.showToast({ title: '订阅消息模板未配置', icon: 'none' })
-        this.setData({ subscribeEnabled: false })
-        return
-      }
-      wx.requestSubscribeMessage({
-        tmplIds: [tid],
-        success: res => {
-          const ok = res[tid] === 'accept'
-          this.setData({ subscribeEnabled: ok })
-          wx.setStorageSync('subscribeEnabled', ok)
-          wx.showToast({ title: ok ? '已开启订阅' : '未授权订阅', icon: 'none' })
-        },
-        fail: () => {
-          this.setData({ subscribeEnabled: false })
-          wx.setStorageSync('subscribeEnabled', false)
-        }
-      })
-    } else {
-      this.setData({ subscribeEnabled: false })
-      wx.setStorageSync('subscribeEnabled', false)
     }
   }
 })

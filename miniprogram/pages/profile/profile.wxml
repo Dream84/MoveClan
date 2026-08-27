@@ -54,17 +54,6 @@
     bindmonthchange="onCalMonthChange"
   />
 
-  <view class="section-title">设置</view>
-  <view class="setting-card card">
-    <view class="setting-row">
-      <view class="setting-info">
-        <view class="setting-title">订阅消息提醒</view>
-        <view class="setting-desc">连续打卡等成就提醒（预留）</view>
-      </view>
-      <switch color="#FF7A45" checked="{{subscribeEnabled}}" bindchange="onSubSwitch" />
-    </view>
-  </view>
-
   <view class="modal-mask" wx:if="{{showEdit}}" bindtap="closeEdit">
     <view class="modal card" catchtap="noop">
       <view class="modal-title">编辑资料</view>

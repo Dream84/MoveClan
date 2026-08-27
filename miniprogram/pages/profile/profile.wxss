@@ -111,23 +111,6 @@
   align-items: center;
 }
 
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.setting-title {
-  font-size: 30rpx;
-  font-weight: 600;
-}
-
-.setting-desc {
-  font-size: 24rpx;
-  color: var(--text-sub);
-  margin-top: 6rpx;
-}
-
 .modal-mask {
   position: fixed;
   top: 0;
