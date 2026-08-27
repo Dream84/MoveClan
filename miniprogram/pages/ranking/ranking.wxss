@@ -1,5 +1,5 @@
 .page {
-  padding: 32rpx 32rpx 160rpx;
+  padding: 32rpx 32rpx 240rpx;
   min-height: 100vh;
   box-sizing: border-box;
 }

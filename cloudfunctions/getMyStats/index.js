@@ -131,12 +131,14 @@ exports.main = async (event) => {
       monthCalories += c.calories
     })
 
-    const allRows = await fetchAll({ openid: OPENID }, { openid: true, checkDate: true, count: true })
+    const allRows = await fetchAll({ openid: OPENID }, { openid: true, checkDate: true, count: true, calories: true })
 
     let totalCount = 0
+    let totalCalories = 0
     const allDates = []
     allRows.forEach(c => {
       totalCount += c.count
+      totalCalories += c.calories
       allDates.push(c.checkDate)
     })
 
@@ -175,6 +177,7 @@ exports.main = async (event) => {
       monthCount,
       monthCalories: Math.round(monthCalories),
       totalCount,
+      totalCalories: Math.round(totalCalories),
       streakDays: streakInfo.streak,
       maxStreakDays: Math.max(prevMax, streakInfo.streak),
       monthDays,

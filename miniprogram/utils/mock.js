@@ -186,6 +186,7 @@ function statsOf(openid, groupId) {
   const monthCount = monthRows.reduce((s, c) => s + c.count, 0)
   const monthCalories = monthRows.reduce((s, c) => s + c.calories, 0)
   const totalCount = rows.reduce((s, c) => s + c.count, 0)
+  const totalCalories = rows.reduce((s, c) => s + c.calories, 0)
   const dates = Array.from(new Set(rows.map(c => c.checkDate))).sort()
   let streak = 0
   let cursor = dateUtil.today()
@@ -213,6 +214,7 @@ function statsOf(openid, groupId) {
     monthCount,
     monthCalories: Math.round(monthCalories),
     totalCount,
+    totalCalories: Math.round(totalCalories),
     streakDays: streak,
     maxStreakDays: Math.max(max, streak),
     monthDays,

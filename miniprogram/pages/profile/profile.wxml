@@ -6,7 +6,7 @@
     </view>
     <view class="profile-text">
       <view class="profile-name">{{userInfo.nickName || '微信用户'}}</view>
-      <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg · 累计打卡 {{stats.totalCount}} 次</view>
+      <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg</view>
     </view>
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
