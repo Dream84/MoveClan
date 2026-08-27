@@ -105,9 +105,20 @@
         <view wx:else class="choose-avatar avatar-fallback">选</view>
         <view class="choose-tip">点击更换头像</view>
       </button>
-      <input class="modal-input" type="nickname" placeholder="请输入昵称" maxlength="30" value="{{editNickName}}" bindinput="onNickInput" />
-      <input class="modal-input" type="digit" placeholder="体重（公斤），用于估算卡路里" maxlength="5" value="{{editWeight}}" bindinput="onWeightInput" />
-      <input class="modal-input" type="digit" placeholder="身高（厘米）" maxlength="5" value="{{editHeight}}" bindinput="onHeightInput" />
+      <view class="modal-field">
+        <text class="modal-label">昵称</text>
+        <input class="modal-input" type="nickname" placeholder="请输入昵称" maxlength="30" value="{{editNickName}}" bindinput="onNickInput" />
+      </view>
+      <view class="modal-field">
+        <text class="modal-label">体重</text>
+        <input class="modal-input" type="digit" placeholder="如 60" maxlength="5" value="{{editWeight}}" bindinput="onWeightInput" />
+        <text class="modal-unit">公斤</text>
+      </view>
+      <view class="modal-field">
+        <text class="modal-label">身高</text>
+        <input class="modal-input" type="digit" placeholder="如 170" maxlength="5" value="{{editHeight}}" bindinput="onHeightInput" />
+        <text class="modal-unit">厘米</text>
+      </view>
       <view class="modal-btns">
         <button class="btn-ghost modal-btn" bindtap="closeEdit">取消</button>
         <button class="btn-primary modal-btn" bindtap="saveProfile">保存</button>

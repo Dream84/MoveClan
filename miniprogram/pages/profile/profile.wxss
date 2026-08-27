@@ -249,12 +249,33 @@
   margin-top: 12rpx;
 }
 
+.modal-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.modal-label {
+  width: 96rpx;
+  font-size: 28rpx;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
 .modal-input {
+  flex: 1;
   background: #FFF7F0;
   border-radius: 24rpx;
   padding: 22rpx 24rpx;
   font-size: 28rpx;
-  margin-bottom: 32rpx;
+}
+
+.modal-unit {
+  width: 72rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: var(--text-sub);
+  flex-shrink: 0;
 }
 
 .modal-btns {
