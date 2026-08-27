@@ -49,6 +49,35 @@
   margin-top: 8rpx;
 }
 
+.profile-bmi {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+.profile-bmi-value {
+  margin-left: 10rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.profile-bmi-label {
+  margin-left: 10rpx;
+  font-size: 22rpx;
+  color: var(--primary);
+  background: var(--primary-bg);
+  border-radius: 10rpx;
+  padding: 2rpx 12rpx;
+}
+
+.profile-bmi-tip {
+  margin-left: 10rpx;
+  color: var(--text-light);
+}
+
 .edit-btn {
   font-size: 24rpx;
   color: var(--primary);
@@ -101,35 +130,6 @@
   border-top: 1rpx solid var(--border);
   font-size: 24rpx;
   color: var(--text-sub);
-}
-
-.bmi-row {
-  display: flex;
-  align-items: center;
-  margin-top: 20rpx;
-  font-size: 24rpx;
-  color: var(--text-sub);
-}
-
-.bmi-value {
-  margin-left: 12rpx;
-  font-size: 32rpx;
-  font-weight: 800;
-  color: var(--primary);
-}
-
-.bmi-label {
-  margin-left: 12rpx;
-  font-size: 24rpx;
-  color: var(--primary);
-  background: var(--primary-bg);
-  border-radius: 12rpx;
-  padding: 2rpx 14rpx;
-}
-
-.bmi-tip {
-  margin-left: 12rpx;
-  color: var(--text-light);
 }
 
 .trend-card {

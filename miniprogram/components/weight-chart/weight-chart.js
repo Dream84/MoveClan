@@ -16,13 +16,14 @@ Component({
   observers: {
     'records, period, metric, anchor, heightCm': function () {
       this._activeIndex = -1
-      this.draw()
+      if (this._ready) this.draw()
     }
   },
 
   lifetimes: {
-    attached() {
-      setTimeout(() => this.draw(), 0)
+    ready() {
+      this._ready = true
+      setTimeout(() => this.draw(), 50)
     }
   },
 

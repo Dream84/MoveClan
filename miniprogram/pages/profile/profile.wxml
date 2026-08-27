@@ -7,6 +7,12 @@
     <view class="profile-text">
       <view class="profile-name">{{userInfo.nickName || '微信用户'}}</view>
       <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg · 身高 {{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}cm</view>
+      <view class="profile-bmi">
+        <text>BMI</text>
+        <text class="profile-bmi-value">{{bmi}}</text>
+        <text class="profile-bmi-label" wx:if="{{bmiLabel}}">{{bmiLabel}}</text>
+        <text class="profile-bmi-tip" wx:else>填身高后显示</text>
+      </view>
     </view>
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
@@ -44,15 +50,17 @@
       <text>本周 {{stats.weekCount}}次 / {{stats.weekCalories}}千卡</text>
       <text>本月 {{stats.monthCount}}次 / {{stats.monthCalories}}千卡</text>
     </view>
-    <view class="bmi-row">
-      <text>BMI</text>
-      <text class="bmi-value">{{bmi}}</text>
-      <text class="bmi-label">{{bmiLabel}}</text>
-      <text class="bmi-tip" wx:if="{{bmi === '--'}}">填身高后显示</text>
-    </view>
   </view>
 
-  <view class="section-title">趋势</view>
+  <view class="section-title">打卡日历</view>
+  <calendar
+    year="{{calYear}}"
+    month="{{calMonth}}"
+    value="{{calValue}}"
+    bindmonthchange="onCalMonthChange"
+  />
+
+  <view class="section-title">体重趋势</view>
   <view class="trend-card card">
     <view class="trend-toggles">
       <view class="seg {{trendMetric === 'weight' ? 'active' : ''}}" data-metric="weight" bindtap="onMetricChange">体重</view>
@@ -79,14 +87,6 @@
       heightCm="{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}"
     />
   </view>
-
-  <view class="section-title">打卡日历</view>
-  <calendar
-    year="{{calYear}}"
-    month="{{calMonth}}"
-    value="{{calValue}}"
-    bindmonthchange="onCalMonthChange"
-  />
 
   <view class="modal-mask" wx:if="{{showEdit}}" bindtap="closeEdit">
     <view class="modal card" catchtap="noop">
