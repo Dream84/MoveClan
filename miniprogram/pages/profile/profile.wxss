@@ -43,39 +43,31 @@
   white-space: nowrap;
 }
 
-.profile-sub {
-  font-size: 24rpx;
-  color: var(--text-sub);
-  margin-top: 8rpx;
-}
-
-.profile-bmi {
+.body-bar {
   display: flex;
-  align-items: center;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: var(--text-sub);
+  margin-bottom: 28rpx;
+  padding: 24rpx 0;
 }
 
-.profile-bmi-value {
-  margin-left: 10rpx;
-  font-size: 30rpx;
+.body-item {
+  flex: 1;
+  text-align: center;
+}
+
+.body-item + .body-item {
+  border-left: 1rpx solid var(--border);
+}
+
+.body-num {
+  font-size: 40rpx;
   font-weight: 800;
   color: var(--primary);
 }
 
-.profile-bmi-label {
-  margin-left: 10rpx;
+.body-label {
   font-size: 22rpx;
-  color: var(--primary);
-  background: var(--primary-bg);
-  border-radius: 10rpx;
-  padding: 2rpx 12rpx;
-}
-
-.profile-bmi-tip {
-  margin-left: 10rpx;
-  color: var(--text-light);
+  color: var(--text-sub);
+  margin-top: 6rpx;
 }
 
 .edit-btn {

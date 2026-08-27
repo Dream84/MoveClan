@@ -9,19 +9,23 @@ exports.main = async (event) => {
   }
   const limit = Math.min(500, Math.max(1, Number(event.limit) || 200))
 
+  let list = []
   try {
     const res = await db.collection('weight_records')
       .where({ openid: OPENID })
       .orderBy('createTime', 'desc')
       .limit(limit)
       .get()
-    const list = (res.data || []).reverse().map(r => ({
+    list = (res.data || []).reverse().map(r => ({
       weightKg: r.weightKg,
       createTime: r.createTime
     }))
-    return { code: 0, message: 'ok', data: { list } }
   } catch (err) {
-    console.error('[getWeightRecords]', err)
-    return { code: 500, message: '获取体重记录失败，请重试' }
+    // 集合尚未创建时降级为空列表，避免前端报错
+    if (!/(not exist|not found|COLLECTION_NOT_EXIST|collection not exists)/i.test(err.errMsg || err.message || '')) {
+      throw err
+    }
   }
+
+  return { code: 0, message: 'ok', data: { list } }
 }

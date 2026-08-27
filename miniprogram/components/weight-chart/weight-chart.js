@@ -73,26 +73,39 @@ Component({
     },
 
     draw() {
-      const query = wx.createSelectorQuery().in(this)
-      query.select('#weightCanvas').fields({ node: true, size: true }).exec(res => {
-        if (!res || !res[0] || !res[0].node) return
-        const canvas = res[0].node
-        const ctx = canvas.getContext('2d')
-        const w = res[0].width
-        const h = res[0].height
-        this._canvasW = w
-        const dpr = (wx.getSystemInfoSync().pixelRatio) || 2
-        canvas.width = w * dpr
-        canvas.height = h * dpr
-        ctx.scale(dpr, dpr)
-        ctx.clearRect(0, 0, w, h)
+      if (this._drawing) return
+      this._drawing = true
+      const tryDraw = attempt => {
+        const query = wx.createSelectorQuery().in(this)
+        query.select('#weightCanvas').fields({ node: true, size: true }).exec(res => {
+          const info = res && res[0]
+          if (info && info.node && info.width > 0 && info.height > 0) {
+            this._drawing = false
+            this.render(info.node, info.width, info.height)
+          } else if (attempt < 10) {
+            setTimeout(() => tryDraw(attempt + 1), 100)
+          } else {
+            this._drawing = false
+          }
+        })
+      }
+      tryDraw(0)
+    },
 
-        const points = this.buildPoints()
-        this._points = points
-        this.setData({ empty: points.length === 0 })
-        if (points.length === 0) return
-        this.paint(ctx, w, h, points)
-      })
+    render(canvas, w, h) {
+      const ctx = canvas.getContext('2d')
+      this._canvasW = w
+      const dpr = (wx.getSystemInfoSync().pixelRatio) || 2
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      ctx.scale(dpr, dpr)
+      ctx.clearRect(0, 0, w, h)
+
+      const points = this.buildPoints()
+      this._points = points
+      this.setData({ empty: points.length === 0 })
+      if (points.length === 0) return
+      this.paint(ctx, w, h, points)
     },
 
     paint(ctx, w, h, points) {
