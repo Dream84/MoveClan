@@ -1,0 +1,9 @@
+{
+  "name": "getWeightRecords",
+  "version": "1.0.0",
+  "description": "获取用户体重历史记录（按时间升序）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -2,6 +2,7 @@
   "enablePullDownRefresh": true,
   "backgroundTextStyle": "dark",
   "usingComponents": {
-    "calendar": "/components/calendar/calendar"
+    "calendar": "/components/calendar/calendar",
+    "weight-chart": "/components/weight-chart/weight-chart"
   }
 }

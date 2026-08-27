@@ -6,7 +6,7 @@
     </view>
     <view class="profile-text">
       <view class="profile-name">{{userInfo.nickName || '微信用户'}}</view>
-      <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg</view>
+      <view class="profile-sub">体重 {{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}kg · 身高 {{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}cm</view>
     </view>
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
@@ -44,6 +44,40 @@
       <text>本周 {{stats.weekCount}}次 / {{stats.weekCalories}}千卡</text>
       <text>本月 {{stats.monthCount}}次 / {{stats.monthCalories}}千卡</text>
     </view>
+    <view class="bmi-row">
+      <text>BMI</text>
+      <text class="bmi-value">{{bmi}}</text>
+      <text class="bmi-label">{{bmiLabel}}</text>
+      <text class="bmi-tip" wx:if="{{bmi === '--'}}">填身高后显示</text>
+    </view>
+  </view>
+
+  <view class="section-title">趋势</view>
+  <view class="trend-card card">
+    <view class="trend-toggles">
+      <view class="seg {{trendMetric === 'weight' ? 'active' : ''}}" data-metric="weight" bindtap="onMetricChange">体重</view>
+      <view class="seg {{trendMetric === 'bmi' ? 'active' : ''}}" data-metric="bmi" bindtap="onMetricChange">BMI</view>
+      <view class="seg-divider"></view>
+      <view class="seg {{trendPeriod === 'day' ? 'active' : ''}}" data-period="day" bindtap="onPeriodChange">日</view>
+      <view class="seg {{trendPeriod === 'month' ? 'active' : ''}}" data-period="month" bindtap="onPeriodChange">月</view>
+      <view class="seg {{trendPeriod === 'year' ? 'active' : ''}}" data-period="year" bindtap="onPeriodChange">年</view>
+    </view>
+
+    <picker mode="date" value="{{trendAnchor}}" end="{{trendPickerEnd}}" fields="{{trendPickerFields}}" bindchange="onAnchorChange">
+      <view class="trend-nav">
+        <view class="nav-btn" catchtap="onPrevAnchor">‹</view>
+        <view class="trend-anchor">{{trendAnchorLabel}}</view>
+        <view class="nav-btn {{canNext ? '' : 'disabled'}}" catchtap="onNextAnchor">›</view>
+      </view>
+    </picker>
+
+    <weight-chart
+      records="{{weightRecords}}"
+      period="{{trendPeriod}}"
+      metric="{{trendMetric}}"
+      anchor="{{trendAnchor}}"
+      heightCm="{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}"
+    />
   </view>
 
   <view class="section-title">打卡日历</view>
@@ -65,6 +99,7 @@
       </button>
       <input class="modal-input" type="nickname" placeholder="请输入昵称" maxlength="30" value="{{editNickName}}" bindinput="onNickInput" />
       <input class="modal-input" type="digit" placeholder="体重（公斤），用于估算卡路里" maxlength="5" value="{{editWeight}}" bindinput="onWeightInput" />
+      <input class="modal-input" type="digit" placeholder="身高（厘米）" maxlength="5" value="{{editHeight}}" bindinput="onHeightInput" />
       <view class="modal-btns">
         <button class="btn-ghost modal-btn" bindtap="closeEdit">取消</button>
         <button class="btn-primary modal-btn" bindtap="saveProfile">保存</button>

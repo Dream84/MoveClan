@@ -17,15 +17,26 @@ Page({
       monthCalories: 0,
       streakDays: 0
     },
+    bmi: '--',
+    bmiLabel: '',
     calYear: new Date().getFullYear(),
     calMonth: new Date().getMonth() + 1,
     calValue: [],
+    weightRecords: [],
     statsLoaded: false,
+    trendMetric: 'weight',
+    trendPeriod: 'day',
+    trendAnchor: '',
+    trendAnchorLabel: '',
+    trendPickerFields: '',
+    trendPickerEnd: '',
+    canNext: true,
     showEdit: false,
     editAvatarUrl: '',
     editAvatarTemp: '',
     editNickName: '',
-    editWeight: ''
+    editWeight: '',
+    editHeight: ''
   },
 
   onShow() {
@@ -48,9 +59,13 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
-        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200)
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
+        trendAnchor: this.data.trendAnchor || this.currentAnchor(this.data.trendPeriod)
       })
+      this.computeBmi()
+      this.syncTrendNav()
       await this.loadStats(!!pull)
+      await this.loadWeight()
     } catch (err) {
       console.error('[profile.refresh]', err)
     }
@@ -104,15 +119,123 @@ Page({
     this.loadMonthDays(e.detail.year, e.detail.month)
   },
 
+  async loadWeight() {
+    try {
+      const data = await api.call('getWeightRecords', {}, { loading: false })
+      this.setData({ weightRecords: data.list || [] })
+    } catch (err) {
+      console.error('[profile.loadWeight]', err)
+    }
+  },
+
+  computeBmi() {
+    const u = this.data.userInfo
+    const height = Number(u && u.heightCm) || 170
+    const weight = Number(u && u.weightKg) || 50
+    let bmi = 0
+    if (height > 0) {
+      bmi = weight / Math.pow(height / 100, 2)
+    }
+    let bmiLabel = ''
+    if (bmi > 0) {
+      if (bmi < 18.5) bmiLabel = '偏瘦'
+      else if (bmi < 24) bmiLabel = '正常'
+      else if (bmi < 28) bmiLabel = '超重'
+      else bmiLabel = '肥胖'
+    }
+    this.setData({ bmi: bmi > 0 ? bmi.toFixed(1) : '--', bmiLabel })
+  },
+
+  // ---------- 趋势：时间导航 ----------
+
+  currentAnchor(period) {
+    const n = new Date()
+    if (period === 'month') return dateUtil.formatDate(n).slice(0, 7)
+    if (period === 'year') return String(n.getFullYear())
+    return dateUtil.formatDate(n)
+  },
+
+  shiftAnchor(period, anchor, delta) {
+    if (period === 'day') {
+      return dateUtil.addDays(anchor, delta)
+    }
+    if (period === 'month') {
+      const parts = anchor.split('-').map(Number)
+      const d = new Date(parts[0], parts[1] - 1 + delta, 1)
+      return `${d.getFullYear()}-${dateUtil.pad(d.getMonth() + 1)}`
+    }
+    return String(Number(anchor) + delta)
+  },
+
+  syncTrendNav() {
+    const { trendPeriod, trendAnchor } = this.data
+    const cur = this.currentAnchor(trendPeriod)
+    const next = this.shiftAnchor(trendPeriod, trendAnchor, 1)
+    let canNext = false
+    if (trendPeriod === 'day') canNext = next <= cur
+    else if (trendPeriod === 'month') canNext = next <= cur
+    else canNext = Number(next) <= Number(cur)
+    const today = dateUtil.today()
+    const fields = trendPeriod === 'month' ? 'month' : trendPeriod === 'year' ? 'year' : ''
+    const end = trendPeriod === 'month' ? today.slice(0, 7) : today
+    this.setData({
+      canNext,
+      trendPickerFields: fields,
+      trendPickerEnd: end,
+      trendAnchorLabel: trendPeriod === 'year' ? trendAnchor + '年' : trendAnchor
+    })
+  },
+
+  onMetricChange(e) {
+    this.setData({ trendMetric: e.currentTarget.dataset.metric })
+  },
+
+  onPeriodChange(e) {
+    const period = e.currentTarget.dataset.period
+    this.setData({ trendPeriod: period, trendAnchor: this.currentAnchor(period) })
+    this.syncTrendNav()
+  },
+
+  onPrevAnchor() {
+    this.setData({ trendAnchor: this.shiftAnchor(this.data.trendPeriod, this.data.trendAnchor, -1) })
+    this.syncTrendNav()
+  },
+
+  onNextAnchor() {
+    const { trendPeriod, trendAnchor } = this.data
+    const next = this.shiftAnchor(trendPeriod, trendAnchor, 1)
+    const cur = this.currentAnchor(trendPeriod)
+    const blocked = trendPeriod === 'year'
+      ? Number(next) > Number(cur)
+      : next > cur
+    if (blocked) return
+    this.setData({ trendAnchor: next })
+    this.syncTrendNav()
+  },
+
+  onAnchorChange(e) {
+    let val = e.detail.value || ''
+    if (this.data.trendPeriod === 'year') val = val.slice(0, 4)
+    if (this.data.trendPeriod === 'month') val = val.slice(0, 7)
+    if (val) {
+      this.setData({ trendAnchor: val })
+      this.syncTrendNav()
+    }
+  },
+
+  // ---------- 编辑资料 ----------
+
   openEdit() {
     const u = this.data.userInfo
     const weight = Number(u && u.weightKg)
+    const height = Number(u && u.heightCm)
     this.setData({
       showEdit: true,
       editAvatarUrl: (u && u.avatarUrl) || '',
       editAvatarTemp: '',
       editNickName: (u && u.nickName) || '',
-      editWeight: weight >= 20 && weight <= 300 ? String(weight) : '50'
+      editWeight: weight >= 20 && weight <= 300 ? String(weight) : '50',
+      editHeight: height >= 50 && height <= 250 ? String(height) : '170'
     })
   },
 
@@ -134,6 +257,10 @@ Page({
     this.setData({ editWeight: e.detail.value })
   },
 
+  onHeightInput(e) {
+    this.setData({ editHeight: e.detail.value })
+  },
+
   async saveProfile() {
     const nickName = this.data.editNickName.trim()
     if (!nickName) {
@@ -143,6 +270,11 @@ Page({
     const weightKg = Number(this.data.editWeight)
     if (this.data.editWeight && !(weightKg >= 20 && weightKg <= 300)) {
       wx.showToast({ title: '体重须为 20-300 公斤', icon: 'none' })
+      return
+    }
+    const heightCm = Number(this.data.editHeight)
+    if (this.data.editHeight && !(heightCm >= 50 && heightCm <= 250)) {
+      wx.showToast({ title: '身高须为 50-250 厘米', icon: 'none' })
       return
     }
     wx.showLoading({ title: '保存中...', mask: true })
@@ -156,7 +288,8 @@ Page({
       const user = await api.call('login', {
         nickName,
         avatarUrl,
-        weightKg: weightKg > 0 ? weightKg : 0
+        weightKg: weightKg > 0 ? weightKg : 0,
+        heightCm: heightCm > 0 ? heightCm : 0
       }, { loading: false })
       app.setUserInfo(user)
       this.setData({
@@ -164,6 +297,8 @@ Page({
         avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
         showEdit: false
       })
+      this.computeBmi()
+      await this.loadWeight()
       wx.showToast({ title: '已保存', icon: 'success' })
     } catch (err) {
       console.error('[profile.saveProfile]', err)

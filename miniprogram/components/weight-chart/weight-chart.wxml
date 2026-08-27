@@ -1,0 +1,4 @@
+<view class="weight-chart">
+  <canvas type="2d" id="weightCanvas" class="chart-canvas" bindtouchstart="onTouchStart"></canvas>
+  <view wx:if="{{empty}}" class="chart-empty">该时间段暂无记录</view>
+</view>

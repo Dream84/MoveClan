@@ -24,6 +24,8 @@ exports.main = async (event) => {
   const avatarUrl = (event.avatarUrl || '').toString()
   const rawWeight = Number(event.weightKg)
   const hasWeight = event.weightKg !== undefined && event.weightKg !== '' && rawWeight >= 20 && rawWeight <= 300
+  const rawHeight = Number(event.heightCm)
+  const hasHeight = event.heightCm !== undefined && event.heightCm !== '' && rawHeight >= 50 && rawHeight <= 250
 
   try {
     const users = db.collection('users')
@@ -39,6 +41,7 @@ exports.main = async (event) => {
           nickName: effectiveNick,
           avatarUrl: effectiveAvatar,
           weightKg: hasWeight ? rawWeight : 50,
+          heightCm: hasHeight ? rawHeight : 170,
           joinTime: db.serverDate(),
           defaultGroupId: '',
           maxStreakDays: 0,
@@ -55,6 +58,7 @@ exports.main = async (event) => {
           nickName: effectiveNick,
           avatarUrl: effectiveAvatar,
           weightKg: hasWeight ? rawWeight : 50,
+          heightCm: hasHeight ? rawHeight : 170,
           isNew: true
         }
       }
@@ -64,8 +68,36 @@ exports.main = async (event) => {
     const updateData = {}
     if (nickName && nickName !== u.nickName) updateData.nickName = nickName
     if (avatarUrl && avatarUrl !== u.avatarUrl) updateData.avatarUrl = avatarUrl
-    if (hasWeight && rawWeight !== u.weightKg) updateData.weightKg = rawWeight
+    if (hasWeight && rawWeight !== u.weightKg) {
+      updateData.weightKg = rawWeight
+      await db.collection('weight_records').add({
+        data: {
+          _openid: OPENID,
+          openid: OPENID,
+          weightKg: rawWeight,
+          createTime: db.serverDate()
+        }
+      })
+    }
     if (!hasWeight && !(u.weightKg >= 20 && u.weightKg <= 300)) updateData.weightKg = 50
+    if (hasHeight && rawHeight !== u.heightCm) updateData.heightCm = rawHeight
+    if (!hasHeight && !(u.heightCm >= 50 && u.heightCm <= 250)) updateData.heightCm = 170
+
+    // 老用户起始基线：已有有效体重但 weight_records 为空（且本次未改体重）→ 插入一条起始记录，保证趋势不断档
+    if (!hasWeight && u.weightKg >= 20 && u.weightKg <= 300) {
+      const cnt = await db.collection('weight_records').where({ openid: OPENID }).count()
+      if (cnt.total === 0) {
+        await db.collection('weight_records').add({
+          data: {
+            _openid: OPENID,
+            openid: OPENID,
+            weightKg: u.weightKg,
+            createTime: db.serverDate()
+          }
+        })
+      }
+    }
+
     const finalUser = Object.assign({}, u, updateData)
     if (Object.keys(updateData).length) {
       await users.doc(u._id).update({ data: updateData })

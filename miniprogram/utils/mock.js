@@ -15,6 +15,7 @@ const mockUsers = [
     nickName: '本地测试',
     avatarUrl: '',
     weightKg: 60,
+    heightCm: 170,
     maxStreakDays: 10,
     achievedMilestones: [7]
   },
@@ -25,6 +26,7 @@ const mockUsers = [
     nickName: '小明',
     avatarUrl: '',
     weightKg: 70,
+    heightCm: 175,
     maxStreakDays: 3,
     achievedMilestones: []
   },
@@ -35,6 +37,7 @@ const mockUsers = [
     nickName: '小红',
     avatarUrl: '',
     weightKg: 52,
+    heightCm: 160,
     maxStreakDays: 5,
     achievedMilestones: []
   }
@@ -273,6 +276,18 @@ const handlers = {
 
   getMyStats({ groupId }) {
     return { code: 0, message: 'ok', data: statsOf(MOCK_OPENID, groupId || '') }
+  },
+
+  getWeightRecords({ limit }) {
+    const n = Math.min(60, Math.max(1, Number(limit) || 30))
+    const list = []
+    for (let i = 0; i < n; i++) {
+      list.push({
+        weightKg: 62 - i * 0.3,
+        createTime: new Date(Date.now() - (n - 1 - i) * 2 * 86400000)
+      })
+    }
+    return { code: 0, message: 'ok', data: { list } }
   },
 
   createGroup({ name, description, sportTheme }) {

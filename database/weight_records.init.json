@@ -1,0 +1,25 @@
+{
+  "collection": "weight_records",
+  "permission": "仅管理端可读写",
+  "permissionRule": "auth != null && auth.openid == null",
+  "indexes": [
+    {
+      "name": "openid_createTime",
+      "fields": [
+        { "field": "openid", "order": "asc" },
+        { "field": "createTime", "order": "asc" }
+      ],
+      "unique": false
+    }
+  ],
+  "sampleDocs": [
+    {
+      "_id": "example",
+      "_openid": "oYOUR_OPENID_HERE",
+      "openid": "oYOUR_OPENID_HERE",
+      "weightKg": 60,
+      "createTime": { "$date": 1756041600000 }
+    }
+  ],
+  "note": "体重历史记录集合（体重曲线数据源）。权限「仅管理端可读写」：写入由 login 云函数在体重变化时新增，读取走 getWeightRecords 云函数，客户端不直读。创建 (openid, createTime) 复合索引。"
+}

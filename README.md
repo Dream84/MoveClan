@@ -34,9 +34,10 @@ MoveClan/
 │   │   └── profile/            # 我的（统计/日历/资料/订阅开关）
 │   └── components/
 │       ├── calendar/           # 打卡日历组件
-│       └── confetti/           # 成就彩带弹窗组件
-├── cloudfunctions/             # ★ 18 个云函数
-├── database/                   # 4 个集合的初始化 JSON（权限/索引/示例）
+│       ├── confetti/           # 成就彩带弹窗组件
+│       └── weight-chart/       # 体重变化曲线组件（Canvas）
+├── cloudfunctions/             # ★ 20 个云函数
+├── database/                   # 5 个集合的初始化 JSON（权限/索引/示例）
 └── docs/superpowers/specs/     # 设计文档
 ```
 
@@ -65,7 +66,7 @@ module.exports = {
 
 ## 三、创建数据库集合与索引
 
-云开发控制台 → 数据库 → 创建以下 4 个集合（详见 `database/` 下对应 JSON 文件）：
+云开发控制台 → 数据库 → 创建以下 5 个集合（详见 `database/` 下对应 JSON 文件）：
 
 | 集合 | 权限设置 | 索引（索引管理里创建） |
 |---|---|---|
@@ -73,6 +74,7 @@ module.exports = {
 | `groups` | 仅管理端可读写（防邀请码直读） | `inviteCode` 唯一索引；`status` |
 | `group_members` | 仅创建者可读写 | `(groupId, openid)` 唯一索引；`openid` |
 | `checkins` | 仅创建者可读写 | `(groupId, checkDate)`；`(openid, checkDate)`；`(groupId, openid, checkDate)`；`(groupId, createTime)` |
+| `weight_records` | 仅管理端可读写 | `(openid, createTime)` |
 
 > `database/*.init.json` 内的 `sampleDocs` 仅供参考字段结构，可直接跳过不导入。
 
@@ -80,7 +82,7 @@ module.exports = {
 
 在开发者工具的资源管理器中，展开 `cloudfunctions`，对每个云函数右键 →「上传并部署：云端安装依赖」。
 
-共 18 个：`login`、`createGroup`、`updateGroup`、`joinGroup`、`getMyGroups`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`、`getFeed`、`likeCheckin`、`commentCheckin`。
+共 20 个：`login`、`createGroup`、`updateGroup`、`joinGroup`、`getMyGroups`、`getGroupInfo`、`getGroupMembers`、`removeMember`、`dismissGroup`、`leaveGroup`、`submitCheckin`、`updateCheckin`、`deleteCheckin`、`getGroupRanking`、`getMyStats`、`getFeed`、`likeCheckin`、`commentCheckin`、`deleteComment`、`getWeightRecords`。
 
 > **内容安全审核（可选）**：`submitCheckin` / `updateCheckin` 通过 `cloud.openapi.security.msgSecCheck` / `imgSecCheck` 调用微信内容安全接口。
 > 若你的小程序类目不支持或接口报错，云函数会自动降级放行并记录日志，不影响打卡功能。
@@ -101,6 +103,7 @@ module.exports = {
 1. **用户隐私保护指引**：微信公众平台「设置 → 服务内容声明 → 用户隐私保护指引」中需声明收集：
    - 用户信息（昵称、头像，用于展示与排行榜）
    - 运动数据（打卡记录，用于统计排行）
+   - 身高体重（用于卡路里估算、BMI 计算与趋势展示）
    - 相册/相机图片（打卡截图，用于留存记录）
    - 评论内容（动态评论，用于互动展示）
    并说明用途与开发者联系方式。
