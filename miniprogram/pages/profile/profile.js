@@ -137,13 +137,23 @@ Page({
       bmi = weight / Math.pow(height / 100, 2)
     }
     let bmiLabel = ''
+    let bmiColor = ''
     if (bmi > 0) {
-      if (bmi < 18.5) bmiLabel = '偏瘦'
-      else if (bmi < 24) bmiLabel = '正常'
-      else if (bmi < 28) bmiLabel = '超重'
-      else bmiLabel = '肥胖'
+      if (bmi < 18.5) {
+        bmiLabel = '偏瘦'
+        bmiColor = '#4A90E2'
+      } else if (bmi < 24) {
+        bmiLabel = '正常'
+        bmiColor = '#34C77B'
+      } else if (bmi < 28) {
+        bmiLabel = '超重'
+        bmiColor = '#FF9A62'
+      } else {
+        bmiLabel = '肥胖'
+        bmiColor = '#F5222D'
+      }
     }
-    this.setData({ bmi: bmi > 0 ? bmi.toFixed(1) : '--', bmiLabel })
+    this.setData({ bmi: bmi > 0 ? bmi.toFixed(1) : '--', bmiLabel, bmiColor })
   },
 
   // ---------- 趋势：时间导航 ----------

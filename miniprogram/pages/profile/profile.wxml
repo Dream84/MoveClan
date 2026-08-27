@@ -21,7 +21,11 @@
     </view>
     <view class="body-item">
       <view class="body-num">{{bmi}}</view>
-      <view class="body-label">BMI{{bmiLabel ? ' · ' + bmiLabel : (bmi === '--' ? ' · 填身高' : '')}}</view>
+      <view class="body-label">
+        BMI
+        <text wx:if="{{bmiLabel}}" class="bmi-status" style="color: {{bmiColor}}"> · {{bmiLabel}}</text>
+        <text wx:elif="{{bmi === '--'}}" class="bmi-status-gray"> · 填身高</text>
+      </view>
     </view>
   </view>
 

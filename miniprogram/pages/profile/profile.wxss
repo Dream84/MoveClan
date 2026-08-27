@@ -70,6 +70,14 @@
   margin-top: 6rpx;
 }
 
+.bmi-status {
+  font-weight: 700;
+}
+
+.bmi-status-gray {
+  color: var(--text-light);
+}
+
 .edit-btn {
   font-size: 24rpx;
   color: var(--primary);
