@@ -11,10 +11,6 @@
   </view>
 
   <view class="bmi-card">
-    <view class="bmi-card-head">
-      <view class="bmi-card-title">HEALTH METER · 身体质量指数</view>
-      <view class="bmi-card-sub">BMI 环形指标 · 按中国成人标准</view>
-    </view>
     <bmi-gauge
       heightCm="{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}"
       weightKg="{{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}"

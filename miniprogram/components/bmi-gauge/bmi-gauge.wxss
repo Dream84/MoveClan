@@ -28,12 +28,11 @@
   height: 14rpx;
   border-radius: 50%;
   margin-right: 6rpx;
-  box-shadow: 0 0 8rpx rgba(255, 255, 255, 0.15);
   flex-shrink: 0;
 }
 
 .legend-text {
-  font-size: 20rpx;
-  color: #8ea0b8;
+  font-size: 24rpx;
+  color: #6b7a90;
   white-space: nowrap;
 }

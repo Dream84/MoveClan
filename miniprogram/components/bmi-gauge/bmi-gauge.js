@@ -137,7 +137,7 @@ Component({
       // 背景
       ctx.beginPath()
       this._roundRect(ctx, 0, 0, w, h, 22 * s)
-      ctx.fillStyle = '#0b1118'
+      ctx.fillStyle = '#ffffff'
       ctx.fill()
 
       // 弧带（入场按 reveal 渐进扫出）
@@ -161,7 +161,7 @@ Component({
         const rr1 = r + sw / 2 + (major ? 26 : 15)
         const p0 = polar(cx, cy, rr0, a)
         const p1 = polar(cx, cy, rr1, a)
-        ctx.strokeStyle = major ? 'rgba(142,160,184,0.9)' : 'rgba(142,160,184,0.45)'
+        ctx.strokeStyle = major ? 'rgba(31,45,61,0.75)' : 'rgba(31,45,61,0.3)'
         ctx.lineWidth = major ? 2 : 1
         ctx.beginPath()
         ctx.moveTo(p0.x, p0.y)
@@ -169,51 +169,51 @@ Component({
         ctx.stroke()
         if (major) {
           const lp = polar(cx, cy, r + sw / 2 + 44, a)
-          ctx.fillStyle = 'rgba(142,160,184,0.85)'
-          ctx.font = `${Math.max(11, 13 * s)}px sans-serif`
+          ctx.fillStyle = '#8a94a6'
+          ctx.font = `${Math.max(12, 15 * s)}px sans-serif`
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.fillText(String(b), lp.x, lp.y)
         }
       }
 
-      // 中心枢纽（双层圆环）
+      // 中心枢纽（双层圆环，浅色）
       ctx.beginPath()
       ctx.arc(cx, cy, 58 * s, 0, TWO_PI)
-      ctx.fillStyle = '#101826'
+      ctx.fillStyle = '#f3f5f9'
       ctx.fill()
-      ctx.strokeStyle = 'rgba(255,255,255,0.18)'
+      ctx.strokeStyle = 'rgba(31,45,61,0.08)'
       ctx.lineWidth = 1.5
       ctx.stroke()
       ctx.beginPath()
       ctx.arc(cx, cy, 46 * s, 0, TWO_PI)
-      ctx.fillStyle = '#0c1420'
+      ctx.fillStyle = '#ffffff'
       ctx.fill()
 
       ctx.textAlign = 'center'
       const value = this._drawValue
       if (value != null) {
-        ctx.fillStyle = '#eaf2ff'
-        ctx.font = `bold ${34 * s}px sans-serif`
+        ctx.fillStyle = '#1f2d3d'
+        ctx.font = `bold ${40 * s}px sans-serif`
         ctx.textBaseline = 'alphabetic'
-        ctx.fillText(value.toFixed(1), cx, cy - 4 * s)
+        ctx.fillText(value.toFixed(1), cx, cy - 2 * s)
         ctx.fillStyle = this._category.color
-        ctx.font = `600 ${19 * s}px sans-serif`
-        ctx.fillText(this._category.text, cx, cy + 24 * s)
+        ctx.font = `600 ${24 * s}px sans-serif`
+        ctx.fillText(this._category.text, cx, cy + 30 * s)
       } else {
-        ctx.fillStyle = '#3a4557'
-        ctx.font = `bold ${30 * s}px sans-serif`
-        ctx.fillText('--', cx, cy - 6 * s)
-        ctx.fillStyle = '#6b7a90'
-        ctx.font = `${16 * s}px sans-serif`
-        ctx.fillText(this._category.text, cx, cy + 20 * s)
+        ctx.fillStyle = '#c0c6d0'
+        ctx.font = `bold ${34 * s}px sans-serif`
+        ctx.fillText('--', cx, cy - 2 * s)
+        ctx.fillStyle = '#8a94a6'
+        ctx.font = `${20 * s}px sans-serif`
+        ctx.fillText(this._category.text, cx, cy + 26 * s)
       }
 
-      // 身高体重摘要：置于中心圆环下方
-      ctx.fillStyle = '#6b7a90'
-      ctx.font = `${17 * s}px sans-serif`
+      // 身高体重摘要：置于中心圆环下方，字号略小于 BMI 值
+      ctx.fillStyle = '#5a6478'
+      ctx.font = `bold ${28 * s}px sans-serif`
       ctx.textBaseline = 'alphabetic'
-      ctx.fillText(this._summary, cx, cy + 74 * s)
+      ctx.fillText(this._summary, cx, cy + 82 * s)
 
       // 白色发光小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
       if (this._valid && this._drawDeg != null) {
@@ -223,9 +223,9 @@ Component({
         const L = 166 * s
         const baseX = L - 16 * s
         const hw = 6 * s
-        ctx.shadowColor = 'rgba(255,255,255,0.35)'
+        ctx.shadowColor = 'rgba(0,0,0,0.28)'
         ctx.shadowBlur = 4 * s
-        ctx.fillStyle = '#ffffff'
+        ctx.fillStyle = '#1f2d3d'
         ctx.beginPath()
         ctx.moveTo(L, 0)
         ctx.quadraticCurveTo(L - 6 * s, hw + 2.5 * s, baseX, hw)

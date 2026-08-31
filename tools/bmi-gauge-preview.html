@@ -7,8 +7,8 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0b1118;
-    color: #eaf2ff;
+    background: #f2f4f7;
+    color: #1f2d3d;
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     display: flex;
     justify-content: center;
@@ -19,31 +19,31 @@
   .head { margin-bottom: 24px; }
   .title { font-size: 22px; font-weight: 800; letter-spacing: 2px; }
   .subtitle { font-size: 14px; color: #3ddc97; margin-top: 6px; font-weight: 600; }
-  .desc { font-size: 12px; color: #6b7a90; margin-top: 8px; }
+  .desc { font-size: 12px; color: #8a94a6; margin-top: 8px; }
   .input-card {
-    background: #101826; border-radius: 14px; padding: 6px 18px; margin-bottom: 14px;
+    background: #ffffff; border-radius: 14px; padding: 6px 18px; margin-bottom: 14px;
+    box-shadow: 0 6px 20px rgba(31,45,61,0.06);
   }
   .input-row { display: flex; align-items: center; padding: 14px 0; }
-  .input-row + .input-row { border-top: 1px solid rgba(255,255,255,0.06); }
-  .input-label { width: 56px; font-size: 15px; color: #8ea0b8; }
+  .input-row + .input-row { border-top: 1px solid #f0f2f5; }
+  .input-label { width: 56px; font-size: 15px; color: #6b7a90; }
   .input { flex: 1; text-align: right; background: transparent; border: none; outline: none;
-    color: #eaf2ff; font-size: 16px; }
-  .input-unit { width: 36px; text-align: right; font-size: 13px; color: #6b7a90; }
+    color: #1f2d3d; font-size: 18px; font-weight: 700; }
+  .input-unit { width: 36px; text-align: right; font-size: 13px; color: #8a94a6; }
   .samples { display: flex; gap: 10px; margin-bottom: 18px; }
-  .sample { padding: 8px 14px; border-radius: 18px; background: #1a2436; color: #8ea0b8;
+  .sample { padding: 8px 14px; border-radius: 18px; background: #e8ecf2; color: #6b7a90;
     font-size: 13px; cursor: pointer; border: none; font-family: inherit; }
-  .sample:hover { background: #24304a; }
+  .sample:hover { background: #dde3ec; }
   .gauge-card {
-    background: #0b1118; border-radius: 16px; padding: 10px;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    background: #ffffff; border-radius: 16px; padding: 10px;
+    border: 1px solid #f0f2f5;
+    box-shadow: 0 16px 48px rgba(31,45,61,0.08);
   }
   .gauge-canvas { width: 100%; aspect-ratio: 520 / 440; display: block; border-radius: 12px; }
   .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 2px; }
   .legend-item { display: flex; align-items: center; }
-  .legend-dot { width: 7px; height: 7px; border-radius: 50%; margin-right: 5px;
-    box-shadow: 0 0 6px rgba(255,255,255,0.15); }
-  .legend-text { font-size: 11px; color: #8ea0b8; white-space: nowrap; }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+  .legend-text { font-size: 12px; color: #6b7a90; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -173,7 +173,7 @@
 
     // 背景
     roundRect(0, 0, w, h, 22 * s)
-    ctx.fillStyle = '#0b1118'
+    ctx.fillStyle = '#ffffff'
     ctx.fill()
 
     // 弧带
@@ -196,7 +196,7 @@
       const rr1 = r + sw / 2 + (major ? 26 : 15)
       const p0 = polar(cx, cy, rr0, a)
       const p1 = polar(cx, cy, rr1, a)
-      ctx.strokeStyle = major ? 'rgba(142,160,184,0.9)' : 'rgba(142,160,184,0.45)'
+      ctx.strokeStyle = major ? 'rgba(31,45,61,0.75)' : 'rgba(31,45,61,0.3)'
       ctx.lineWidth = major ? 2 : 1
       ctx.beginPath()
       ctx.moveTo(p0.x, p0.y)
@@ -204,43 +204,43 @@
       ctx.stroke()
       if (major) {
         const lp = polar(cx, cy, r + sw / 2 + 44, a)
-        ctx.fillStyle = 'rgba(142,160,184,0.85)'
-        ctx.font = '13px sans-serif'
+        ctx.fillStyle = '#8a94a6'
+        ctx.font = '15px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(String(b), lp.x, lp.y)
       }
     }
 
-    // 中心枢纽
+    // 中心枢纽（浅色）
     ctx.beginPath(); ctx.arc(cx, cy, 58 * s, 0, TWO_PI)
-    ctx.fillStyle = '#101826'; ctx.fill()
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.5; ctx.stroke()
+    ctx.fillStyle = '#f3f5f9'; ctx.fill()
+    ctx.strokeStyle = 'rgba(31,45,61,0.08)'; ctx.lineWidth = 1.5; ctx.stroke()
     ctx.beginPath(); ctx.arc(cx, cy, 46 * s, 0, TWO_PI)
-    ctx.fillStyle = '#0c1420'; ctx.fill()
+    ctx.fillStyle = '#ffffff'; ctx.fill()
 
     ctx.textAlign = 'center'
     if (shownValue != null) {
-      ctx.fillStyle = '#eaf2ff'
-      ctx.font = 'bold 34px sans-serif'
+      ctx.fillStyle = '#1f2d3d'
+      ctx.font = 'bold 40px sans-serif'
       ctx.textBaseline = 'alphabetic'
-      ctx.fillText(shownValue.toFixed(1), cx, cy - 4)
+      ctx.fillText(shownValue.toFixed(1), cx, cy - 2)
       ctx.fillStyle = category.color
-      ctx.font = '600 19px sans-serif'
-      ctx.fillText(category.text, cx, cy + 24)
+      ctx.font = '600 24px sans-serif'
+      ctx.fillText(category.text, cx, cy + 30)
     } else {
-      ctx.fillStyle = '#3a4557'
-      ctx.font = 'bold 30px sans-serif'
-      ctx.fillText('--', cx, cy - 6)
-      ctx.fillStyle = '#6b7a90'
-      ctx.font = '16px sans-serif'
-      ctx.fillText(category.text, cx, cy + 20)
+      ctx.fillStyle = '#c0c6d0'
+      ctx.font = 'bold 34px sans-serif'
+      ctx.fillText('--', cx, cy - 2)
+      ctx.fillStyle = '#8a94a6'
+      ctx.font = '20px sans-serif'
+      ctx.fillText(category.text, cx, cy + 26)
     }
-    // 身高体重摘要：置于中心圆环下方
-    ctx.fillStyle = '#6b7a90'
-    ctx.font = '17px sans-serif'
+    // 身高体重摘要：置于中心圆环下方，字号略小于 BMI 值
+    ctx.fillStyle = '#5a6478'
+    ctx.font = 'bold 28px sans-serif'
     ctx.textBaseline = 'alphabetic'
-    ctx.fillText(summary, cx, cy + 74)
+    ctx.fillText(summary, cx, cy + 82)
 
     // 白色发光小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
     if (valid && drawDeg != null) {
@@ -248,9 +248,9 @@
       ctx.translate(cx, cy)
       ctx.rotate(drawDeg * Math.PI / 180)
       const L = 166 * s, baseX = L - 16 * s, hw = 6 * s
-      ctx.shadowColor = 'rgba(255,255,255,0.35)'
+      ctx.shadowColor = 'rgba(0,0,0,0.28)'
       ctx.shadowBlur = 4 * s
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = '#1f2d3d'
       ctx.beginPath()
       ctx.moveTo(L, 0)
       ctx.quadraticCurveTo(L - 6 * s, hw + 2.5 * s, baseX, hw)

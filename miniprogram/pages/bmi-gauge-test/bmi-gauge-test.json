@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "BMI 环形指标",
-  "navigationBarBackgroundColor": "#0b1118",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#0b1118",
-  "usingComponents": {
-    "bmi-gauge": "/components/bmi-gauge/bmi-gauge"
-  }
-}

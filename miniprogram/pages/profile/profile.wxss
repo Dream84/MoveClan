@@ -44,31 +44,12 @@
 }
 
 .bmi-card {
-  background: #0b1118;
+  background: #ffffff;
   border-radius: 32rpx;
-  padding: 28rpx 24rpx 20rpx;
+  padding: 20rpx 12rpx 12rpx;
   margin-bottom: 28rpx;
-  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.35);
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
-}
-
-.bmi-card-head {
-  text-align: center;
-  margin-bottom: 16rpx;
-}
-
-.bmi-card-title {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #eaf2ff;
-  letter-spacing: 2rpx;
-}
-
-.bmi-card-sub {
-  font-size: 22rpx;
-  color: #3ddc97;
-  margin-top: 8rpx;
-  font-weight: 600;
+  box-shadow: var(--shadow-light);
+  border: 1rpx solid var(--border);
 }
 
 .edit-btn {
