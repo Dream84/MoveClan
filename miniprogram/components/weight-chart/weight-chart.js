@@ -30,6 +30,7 @@ Component({
   methods: {
     labelFor(period, pos) {
       if (period === 'day') return `${pos}:00`
+      if (period === 'week') return ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][pos] || ''
       if (period === 'month') return `${pos + 1}日`
       return `${pos + 1}月`
     },
@@ -37,6 +38,7 @@ Component({
     bucketTotal() {
       const { period, anchor } = this.data
       if (period === 'day') return 24
+      if (period === 'week') return 7
       if (period === 'month') {
         const p = anchor.split('-')
         return new Date(Number(p[0]), Number(p[1]), 0).getDate()
@@ -46,21 +48,40 @@ Component({
 
     buildPoints() {
       const { records, period, anchor, metric, heightCm } = this.data
+      // 周视图：将锚点规整为周一，避免依赖调用方格式
+      let monday = null
+      if (period === 'week' && anchor) {
+        const a = dateUtil.parseDate(anchor)
+        if (!isNaN(a.getTime())) {
+          const aday = a.getDay() === 0 ? 7 : a.getDay()
+          const mon = new Date(a)
+          mon.setDate(a.getDate() - (aday - 1))
+          monday = dateUtil.formatDate(mon)
+        }
+      }
       const agg = {}
       ;(records || []).forEach(r => {
         const s = dateUtil.formatDateTime(r.createTime)
         if (!s) return
         const dateStr = s.slice(0, 10)
-        const key = period === 'day' ? dateStr : period === 'month' ? dateStr.slice(0, 7) : dateStr.slice(0, 4)
-        if (key !== anchor) return
+        let pos
+        if (period === 'week') {
+          if (!monday) return
+          const offset = dateUtil.diffDays(monday, dateStr)
+          if (offset < 0 || offset > 6) return
+          pos = offset
+        } else {
+          const key = period === 'day' ? dateStr : period === 'month' ? dateStr.slice(0, 7) : dateStr.slice(0, 4)
+          if (key !== anchor) return
+          pos = period === 'day'
+            ? Number(s.slice(11, 13))
+            : period === 'month'
+              ? Number(dateStr.slice(8, 10)) - 1
+              : Number(dateStr.slice(5, 7)) - 1
+        }
         const weight = Number(r.weightKg)
         if (!(weight > 0)) return
         const value = metric === 'bmi' && heightCm > 0 ? weight / Math.pow(heightCm / 100, 2) : weight
-        const pos = period === 'day'
-          ? Number(s.slice(11, 13))
-          : period === 'month'
-            ? Number(dateStr.slice(8, 10)) - 1
-            : Number(dateStr.slice(5, 7)) - 1
         if (!agg[pos]) agg[pos] = { sum: 0, n: 0 }
         agg[pos].sum += value
         agg[pos].n++
@@ -221,6 +242,8 @@ Component({
       const ticks = []
       if (period === 'day') {
         ;[0, 6, 12, 18].forEach(h => ticks.push({ pos: h, label: String(h).padStart(2, '0') }))
+      } else if (period === 'week') {
+        ;['周一', '周二', '周三', '周四', '周五', '周六', '周日'].forEach((l, i) => ticks.push({ pos: i, label: l }))
       } else if (period === 'month') {
         const days = total
         const steps = [0, Math.floor(days / 3), Math.floor((days * 2) / 3), days - 1]

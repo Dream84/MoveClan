@@ -2,7 +2,7 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
-const SPORT_TYPES = ['running', 'cycling', 'swimming', 'rope', 'aerobics', 'badminton', 'basketball', 'football', 'tabletennis', 'boxing', 'weightlifting', 'yoga', 'fitness', 'dance', 'hiking', 'climbing', 'stepper', 'ball', 'other']
+const SPORT_TYPES = ['running', 'cycling', 'swimming', 'rope', 'aerobics', 'badminton', 'basketball', 'football', 'tabletennis', 'boxing', 'weightlifting', 'strength', 'yoga', 'fitness', 'dance', 'pilates', 'kickboxing', 'hiking', 'climbing', 'stepper', 'stairs', 'hiit', 'ball', 'other']
 
 function todayCN() {
   const now = new Date(Date.now() + 8 * 3600 * 1000)

@@ -79,6 +79,7 @@
       <view class="seg {{trendMetric === 'bmi' ? 'active' : ''}}" data-metric="bmi" bindtap="onMetricChange">BMI</view>
       <view class="seg-divider"></view>
       <view class="seg {{trendPeriod === 'day' ? 'active' : ''}}" data-period="day" bindtap="onPeriodChange">日</view>
+      <view class="seg {{trendPeriod === 'week' ? 'active' : ''}}" data-period="week" bindtap="onPeriodChange">周</view>
       <view class="seg {{trendPeriod === 'month' ? 'active' : ''}}" data-period="month" bindtap="onPeriodChange">月</view>
       <view class="seg {{trendPeriod === 'year' ? 'active' : ''}}" data-period="year" bindtap="onPeriodChange">年</view>
     </view>

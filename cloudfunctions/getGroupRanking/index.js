@@ -167,10 +167,14 @@ exports.main = async (event) => {
       totalDuration: agg[openid].totalDuration
     }))
 
+    // 排序：主指标优先；相同时按固定优先级破平：次数 > 卡路里 > 运动时长
+    const TIE_PRIORITY = ['count', 'totalCalories', 'totalDuration']
+    const order = [sortField].concat(TIE_PRIORITY.filter(f => f !== sortField))
     list.sort((a, b) => {
-      const diff = b[sortField] - a[sortField]
-      if (diff !== 0) return diff
-      if (b.count !== a.count) return b.count - a.count
+      for (let i = 0; i < order.length; i++) {
+        const diff = b[order[i]] - a[order[i]]
+        if (diff !== 0) return diff
+      }
       return a.openid.localeCompare(b.openid)
     })
 

@@ -160,6 +160,12 @@ Page({
 
   currentAnchor(period) {
     const n = new Date()
+    if (period === 'week') {
+      const day = n.getDay() === 0 ? 7 : n.getDay()
+      const m = new Date(n)
+      m.setDate(n.getDate() - (day - 1))
+      return dateUtil.formatDate(m)
+    }
     if (period === 'month') return dateUtil.formatDate(n).slice(0, 7)
     if (period === 'year') return String(n.getFullYear())
     return dateUtil.formatDate(n)
@@ -168,6 +174,9 @@ Page({
   shiftAnchor(period, anchor, delta) {
     if (period === 'day') {
       return dateUtil.addDays(anchor, delta)
+    }
+    if (period === 'week') {
+      return dateUtil.addDays(anchor, delta * 7)
     }
     if (period === 'month') {
       const parts = anchor.split('-').map(Number)
@@ -182,17 +191,21 @@ Page({
     const cur = this.currentAnchor(trendPeriod)
     const next = this.shiftAnchor(trendPeriod, trendAnchor, 1)
     let canNext = false
-    if (trendPeriod === 'day') canNext = next <= cur
-    else if (trendPeriod === 'month') canNext = next <= cur
-    else canNext = Number(next) <= Number(cur)
+    if (trendPeriod === 'year') canNext = Number(next) <= Number(cur)
+    else canNext = next <= cur
     const today = dateUtil.today()
     const fields = trendPeriod === 'month' ? 'month' : trendPeriod === 'year' ? 'year' : ''
     const end = trendPeriod === 'month' ? today.slice(0, 7) : today
+    let anchorLabel = trendAnchor
+    if (trendPeriod === 'year') anchorLabel = trendAnchor + '年'
+    else if (trendPeriod === 'week') {
+      anchorLabel = `${trendAnchor.slice(5).replace('-', '.')}~${dateUtil.addDays(trendAnchor, 6).slice(5).replace('-', '.')}`
+    }
     this.setData({
       canNext,
       trendPickerFields: fields,
       trendPickerEnd: end,
-      trendAnchorLabel: trendPeriod === 'year' ? trendAnchor + '年' : trendAnchor
+      trendAnchorLabel: anchorLabel
     })
   },
 
@@ -227,6 +240,14 @@ Page({
     let val = e.detail.value || ''
     if (this.data.trendPeriod === 'year') val = val.slice(0, 4)
     if (this.data.trendPeriod === 'month') val = val.slice(0, 7)
+    if (this.data.trendPeriod === 'week') {
+      const d = dateUtil.parseDate(val)
+      if (!isNaN(d.getTime())) {
+        const day = d.getDay() === 0 ? 7 : d.getDay()
+        d.setDate(d.getDate() - (day - 1))
+        val = dateUtil.formatDate(d)
+      }
+    }
     if (val) {
       this.setData({ trendAnchor: val })
       this.syncTrendNav()
