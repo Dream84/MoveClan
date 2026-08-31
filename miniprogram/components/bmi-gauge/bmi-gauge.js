@@ -44,26 +44,26 @@ Component({
   methods: {
     _ensureCanvas(cb) {
       const tryIt = n => {
-        wx.createSelectorQuery().in(this).select('#bmiGaugeCanvas').fields({ node: true, size: true }).exec(res => {
+        const q = wx.createSelectorQuery().in(this)
+        q.select('#bmiGaugeCanvas').fields({ node: true })
+        q.select('#bmiGaugeCanvas').boundingClientRect()
+        q.exec(res => {
           const info = res && res[0]
+          const rect = res && res[1]
           if (!info || !info.node) {
             if (n < 20) setTimeout(() => tryIt(n + 1), 80)
             return
           }
-          const node = info.node
-          let w = info.width
-          let h = info.height
-          if (h <= 0) {
-            // aspect-ratio 未生效时按 520:440 比例兜底设置高度，避免画布为 0 显示空白
-            h = Math.round(w * 440 / 520)
-            try {
-              node.style.height = h + 'px'
-            } catch (e) {
-              console.error('[bmi-gauge:setHeight]', e)
-            }
+          let w = rect && rect.width
+          let h = rect && rect.height
+          if (!(w > 0)) {
+            w = (wx.getSystemInfoSync().windowWidth || 375) - 32
           }
-          this._canvas = node
-          this._ctx = node.getContext('2d')
+          if (!(h > 0)) {
+            h = Math.round(w * 440 / 520)
+          }
+          this._canvas = info.node
+          this._ctx = info.node.getContext('2d')
           this._w = w
           this._h = h
           if (cb) cb()
@@ -138,22 +138,29 @@ Component({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, w, h)
 
-      const s = h / DESIGN.h
-      const cx = DESIGN.cx * s
-      const cy = DESIGN.cy * s
-      const r = DESIGN.r * s
-      const sw = DESIGN.sw * s
-      const rad = d => d * Math.PI / 180
-      const TWO_PI = Math.PI * 2
-
-      // 背景
+      // 背景（画布坐标，不参与缩放）
       ctx.beginPath()
-      this._roundRect(ctx, 0, 0, w, h, 22 * s)
+      this._roundRect(ctx, 0, 0, w, h, Math.min(22, h * 0.06))
       ctx.fillStyle = '#ffffff'
       ctx.fill()
 
-      // 弧带（入场按 reveal 渐进扫出）
+      // 等比缩放居中：设计坐标 520x440 完整映射到画布
+      const s = Math.min(w / DESIGN.w, h / DESIGN.h)
+      ctx.save()
+      ctx.translate(w / 2, h / 2)
+      ctx.scale(s, s)
+      ctx.translate(-DESIGN.cx, -DESIGN.cy)
+      this._drawGauge(ctx)
+      ctx.restore()
+    },
+
+    _drawGauge(ctx) {
+      const { cx, cy, r, sw } = DESIGN
+      const rad = d => d * Math.PI / 180
+      const TWO_PI = Math.PI * 2
+
       const reveal = this._drawReveal != null ? this._drawReveal : 1
+      // 弧带（入场按 reveal 渐进扫出）
       ctx.lineCap = 'butt'
       SEGS.forEach(seg => {
         const span = seg.a1 - seg.a0
@@ -182,7 +189,7 @@ Component({
         if (major) {
           const lp = polar(cx, cy, r + sw / 2 + 44, a)
           ctx.fillStyle = '#8a94a6'
-          ctx.font = `${Math.max(12, 15 * s)}px sans-serif`
+          ctx.font = '15px sans-serif'
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.fillText(String(b), lp.x, lp.y)
@@ -191,14 +198,14 @@ Component({
 
       // 中心枢纽（双层圆环，浅色）
       ctx.beginPath()
-      ctx.arc(cx, cy, 58 * s, 0, TWO_PI)
+      ctx.arc(cx, cy, 58, 0, TWO_PI)
       ctx.fillStyle = '#f3f5f9'
       ctx.fill()
       ctx.strokeStyle = 'rgba(31,45,61,0.08)'
       ctx.lineWidth = 1.5
       ctx.stroke()
       ctx.beginPath()
-      ctx.arc(cx, cy, 46 * s, 0, TWO_PI)
+      ctx.arc(cx, cy, 46, 0, TWO_PI)
       ctx.fillStyle = '#ffffff'
       ctx.fill()
 
@@ -206,43 +213,43 @@ Component({
       const value = this._drawValue
       if (value != null) {
         ctx.fillStyle = '#1f2d3d'
-        ctx.font = `bold ${40 * s}px sans-serif`
+        ctx.font = 'bold 40px sans-serif'
         ctx.textBaseline = 'alphabetic'
-        ctx.fillText(value.toFixed(1), cx, cy - 2 * s)
+        ctx.fillText(value.toFixed(1), cx, cy - 2)
         ctx.fillStyle = this._category.color
-        ctx.font = `600 ${24 * s}px sans-serif`
-        ctx.fillText(this._category.text, cx, cy + 30 * s)
+        ctx.font = '600 24px sans-serif'
+        ctx.fillText(this._category.text, cx, cy + 30)
       } else {
         ctx.fillStyle = '#c0c6d0'
-        ctx.font = `bold ${34 * s}px sans-serif`
-        ctx.fillText('--', cx, cy - 2 * s)
+        ctx.font = 'bold 34px sans-serif'
+        ctx.fillText('--', cx, cy - 2)
         ctx.fillStyle = '#8a94a6'
-        ctx.font = `${20 * s}px sans-serif`
-        ctx.fillText(this._category.text, cx, cy + 26 * s)
+        ctx.font = '20px sans-serif'
+        ctx.fillText(this._category.text, cx, cy + 26)
       }
 
       // 身高体重摘要：置于中心圆环下方，字号略小于 BMI 值
       ctx.fillStyle = '#5a6478'
-      ctx.font = `bold ${28 * s}px sans-serif`
+      ctx.font = 'bold 28px sans-serif'
       ctx.textBaseline = 'alphabetic'
-      ctx.fillText(this._summary, cx, cy + 82 * s)
+      ctx.fillText(this._summary, cx, cy + 82)
 
-      // 白色发光小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
+      // 深色小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
       if (this._valid && this._drawDeg != null) {
         ctx.save()
         ctx.translate(cx, cy)
         ctx.rotate(this._drawDeg * Math.PI / 180)
-        const L = 166 * s
-        const baseX = L - 16 * s
-        const hw = 6 * s
+        const L = 166
+        const baseX = L - 16
+        const hw = 6
         ctx.shadowColor = 'rgba(0,0,0,0.28)'
-        ctx.shadowBlur = 4 * s
+        ctx.shadowBlur = 4
         ctx.fillStyle = '#1f2d3d'
         ctx.beginPath()
         ctx.moveTo(L, 0)
-        ctx.quadraticCurveTo(L - 6 * s, hw + 2.5 * s, baseX, hw)
-        ctx.quadraticCurveTo(baseX - 4 * s, 0, baseX, -hw)
-        ctx.quadraticCurveTo(L - 6 * s, -hw - 2.5 * s, L, 0)
+        ctx.quadraticCurveTo(L - 6, hw + 2.5, baseX, hw)
+        ctx.quadraticCurveTo(baseX - 4, 0, baseX, -hw)
+        ctx.quadraticCurveTo(L - 6, -hw - 2.5, L, 0)
         ctx.closePath()
         ctx.fill()
         ctx.shadowBlur = 0

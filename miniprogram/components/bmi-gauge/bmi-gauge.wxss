@@ -4,7 +4,7 @@
 
 .gauge-canvas {
   width: 100%;
-  aspect-ratio: 520 / 440;
+  height: 480rpx;
   display: block;
   border-radius: 24rpx;
 }
