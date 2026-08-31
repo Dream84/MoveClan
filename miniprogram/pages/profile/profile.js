@@ -17,8 +17,6 @@ Page({
       monthCalories: 0,
       streakDays: 0
     },
-    bmi: '--',
-    bmiLabel: '',
     calYear: new Date().getFullYear(),
     calMonth: new Date().getMonth() + 1,
     calValue: [],
@@ -62,7 +60,6 @@ Page({
         avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
         trendAnchor: this.data.trendAnchor || this.currentAnchor(this.data.trendPeriod)
       })
-      this.computeBmi()
       this.syncTrendNav()
       await this.loadStats(!!pull)
       await this.loadWeight()
@@ -126,34 +123,6 @@ Page({
     } catch (err) {
       console.error('[profile.loadWeight]', err)
     }
-  },
-
-  computeBmi() {
-    const u = this.data.userInfo
-    const height = Number(u && u.heightCm) || 170
-    const weight = Number(u && u.weightKg) || 50
-    let bmi = 0
-    if (height > 0) {
-      bmi = weight / Math.pow(height / 100, 2)
-    }
-    let bmiLabel = ''
-    let bmiColor = ''
-    if (bmi > 0) {
-      if (bmi < 18.5) {
-        bmiLabel = '偏瘦'
-        bmiColor = '#4A90E2'
-      } else if (bmi < 24) {
-        bmiLabel = '正常'
-        bmiColor = '#34C77B'
-      } else if (bmi < 28) {
-        bmiLabel = '超重'
-        bmiColor = '#FF9A62'
-      } else {
-        bmiLabel = '肥胖'
-        bmiColor = '#F5222D'
-      }
-    }
-    this.setData({ bmi: bmi > 0 ? bmi.toFixed(1) : '--', bmiLabel, bmiColor })
   },
 
   // ---------- 趋势：时间导航 ----------
@@ -328,7 +297,6 @@ Page({
         avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
         showEdit: false
       })
-      this.computeBmi()
       await this.loadWeight()
       wx.showToast({ title: '已保存', icon: 'success' })
     } catch (err) {

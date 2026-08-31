@@ -6,7 +6,8 @@
     "pages/groups/groups",
     "pages/profile/profile",
     "pages/group-detail/group-detail",
-    "pages/checkin-edit/checkin-edit"
+    "pages/checkin-edit/checkin-edit",
+    "pages/bmi-gauge-test/bmi-gauge-test"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FF7A45",

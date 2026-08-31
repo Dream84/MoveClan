@@ -10,23 +10,15 @@
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
 
-  <view class="body-bar card">
-    <view class="body-item">
-      <view class="body-num">{{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}</view>
-      <view class="body-label">体重（kg）</view>
+  <view class="bmi-card">
+    <view class="bmi-card-head">
+      <view class="bmi-card-title">HEALTH METER · 身体质量指数</view>
+      <view class="bmi-card-sub">BMI 环形指标 · 按中国成人标准</view>
     </view>
-    <view class="body-item">
-      <view class="body-num">{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}</view>
-      <view class="body-label">身高（cm）</view>
-    </view>
-    <view class="body-item">
-      <view class="body-num">{{bmi}}</view>
-      <view class="body-label">
-        BMI
-        <text wx:if="{{bmiLabel}}" class="bmi-status" style="color: {{bmiColor}}"> · {{bmiLabel}}</text>
-        <text wx:elif="{{bmi === '--'}}" class="bmi-status-gray"> · 填身高</text>
-      </view>
-    </view>
+    <bmi-gauge
+      heightCm="{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}"
+      weightKg="{{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}"
+    />
   </view>
 
   <view class="stats-card card">

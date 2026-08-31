@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI 环形指标卡 · 预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0b1118;
+    color: #eaf2ff;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 16px 48px;
+  }
+  .page { width: 100%; max-width: 520px; }
+  .head { margin-bottom: 24px; }
+  .title { font-size: 22px; font-weight: 800; letter-spacing: 2px; }
+  .subtitle { font-size: 14px; color: #3ddc97; margin-top: 6px; font-weight: 600; }
+  .desc { font-size: 12px; color: #6b7a90; margin-top: 8px; }
+  .input-card {
+    background: #101826; border-radius: 14px; padding: 6px 18px; margin-bottom: 14px;
+  }
+  .input-row { display: flex; align-items: center; padding: 14px 0; }
+  .input-row + .input-row { border-top: 1px solid rgba(255,255,255,0.06); }
+  .input-label { width: 56px; font-size: 15px; color: #8ea0b8; }
+  .input { flex: 1; text-align: right; background: transparent; border: none; outline: none;
+    color: #eaf2ff; font-size: 16px; }
+  .input-unit { width: 36px; text-align: right; font-size: 13px; color: #6b7a90; }
+  .samples { display: flex; gap: 10px; margin-bottom: 18px; }
+  .sample { padding: 8px 14px; border-radius: 18px; background: #1a2436; color: #8ea0b8;
+    font-size: 13px; cursor: pointer; border: none; font-family: inherit; }
+  .sample:hover { background: #24304a; }
+  .gauge-card {
+    background: #0b1118; border-radius: 16px; padding: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  }
+  .gauge-canvas { width: 100%; aspect-ratio: 520 / 440; display: block; border-radius: 12px; }
+  .legend { display: flex; justify-content: center; gap: 18px; margin-top: 2px; }
+  .legend-item { display: flex; align-items: center; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;
+    box-shadow: 0 0 6px rgba(255,255,255,0.15); }
+  .legend-text { font-size: 12px; color: #8ea0b8; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="head">
+      <div class="title">HEALTH METER · 身体质量指数</div>
+      <div class="subtitle">BMI 环形指标 · 按中国成人标准</div>
+      <div class="desc">270° 环形仪表 · 指针随数值平滑转动（Canvas 预览）</div>
+    </div>
+
+    <div class="input-card">
+      <div class="input-row">
+        <span class="input-label">身高</span>
+        <input class="input" id="heightInput" type="number" value="165" inputmode="decimal">
+        <span class="input-unit">cm</span>
+      </div>
+      <div class="input-row">
+        <span class="input-label">体重</span>
+        <input class="input" id="weightInput" type="number" value="67" inputmode="decimal">
+        <span class="input-unit">kg</span>
+      </div>
+    </div>
+
+    <div class="samples">
+      <button class="sample" onclick="setSample(165,67)">默认 165/67</button>
+      <button class="sample" onclick="setSample(165,80)">测试 165/80</button>
+    </div>
+
+    <div class="gauge-card">
+      <canvas id="gauge" class="gauge-canvas" width="520" height="440"></canvas>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#4fb3ff"></span><span class="legend-text">偏瘦 &lt;18.5</span></span>
+        <span class="legend-item"><span class="legend-dot" style="background:#3ddc97"></span><span class="legend-text">正常 18.5–23.9</span></span>
+        <span class="legend-item"><span class="legend-dot" style="background:#ffb020"></span><span class="legend-text">超重 24–27.9</span></span>
+        <span class="legend-item"><span class="legend-dot" style="background:#ff5a5f"></span><span class="legend-text">肥胖 ≥28</span></span>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const DESIGN = { w: 520, h: 440, cx: 260, cy: 260, r: 180, sw: 26 }
+  const SEGS = [
+    { c: '#4fb3ff', a0: 135.9, a1: 210.6, label: '偏瘦' },
+    { c: '#3ddc97', a0: 212.4, a1: 260.1, label: '正常' },
+    { c: '#ffb020', a0: 261.9, a1: 296.1, label: '超重' },
+    { c: '#ff5a5f', a0: 297.9, a1: 404.1, label: '肥胖' }
+  ]
+  const angleOf = bmi => 135 + ((bmi - 10) / 30) * 270
+  const polar = (cx, cy, radius, deg) => {
+    const rad = deg * Math.PI / 180
+    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) }
+  }
+
+  const canvas = document.getElementById('gauge')
+  const ctx = canvas.getContext('2d')
+
+  let shownValue = null
+  let drawDeg = 135
+  let reveal = 0
+  let valid = false
+  let category = { text: '待录入', color: '#6b7a90' }
+  let summary = '录入身高体重后展示'
+  let tick = null
+
+  function recalc() {
+    const h = Number(document.getElementById('heightInput').value)
+    const w = Number(document.getElementById('weightInput').value)
+    valid = h > 0 && w > 0
+    summary = valid ? `${h}cm · ${w}kg` : '录入身高体重后展示'
+    let bmi = null
+    let deg = 135
+    if (valid) {
+      bmi = w / Math.pow(h / 100, 2)
+      if (bmi < 18.5) category = { text: '偏瘦', color: '#4fb3ff' }
+      else if (bmi < 24) category = { text: '正常', color: '#3ddc97' }
+      else if (bmi < 28) category = { text: '超重', color: '#ffb020' }
+      else category = { text: '肥胖', color: '#ff5a5f' }
+      deg = Math.min(405, Math.max(135, angleOf(bmi)))
+    }
+    animate(bmi, deg)
+  }
+
+  function animate(bmi, deg) {
+    const startValue = shownValue != null ? shownValue : (bmi || 0)
+    const startDeg = drawDeg != null ? drawDeg : 135
+    const startReveal = reveal
+    const hasBmi = bmi != null
+    const t0 = performance.now()
+    clearTimeout(tick)
+    const dur = 700
+    const ease = t => 1 - Math.pow(1 - t, 3)
+    const step = now => {
+      const t = Math.min(1, (now - t0) / dur)
+      const tv = Math.min(1, t * (500 / dur))
+      if (hasBmi) shownValue = startValue + (bmi - startValue) * ease(tv)
+      drawDeg = startDeg + (deg - startDeg) * ease(t)
+      reveal = startReveal + (1 - startReveal) * ease(tv)
+      render()
+      if (t < 1) tick = setTimeout(() => step(performance.now()), 16)
+      else {
+        if (hasBmi) shownValue = bmi
+        drawDeg = deg
+        reveal = 1
+        render()
+      }
+    }
+    step(performance.now())
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.arcTo(x + w, y, x + w, y + h, r)
+    ctx.arcTo(x + w, y + h, x, y + h, r)
+    ctx.arcTo(x, y + h, x, y, r)
+    ctx.arcTo(x, y, x + w, y, r)
+    ctx.closePath()
+  }
+
+  function render() {
+    const w = DESIGN.w, h = DESIGN.h
+    const s = h / DESIGN.h
+    const cx = DESIGN.cx * s, cy = DESIGN.cy * s, r = DESIGN.r * s, sw = DESIGN.sw * s
+    const rad = d => d * Math.PI / 180
+    const TWO_PI = Math.PI * 2
+    ctx.clearRect(0, 0, w, h)
+
+    // 背景
+    roundRect(0, 0, w, h, 22 * s)
+    ctx.fillStyle = '#0b1118'
+    ctx.fill()
+
+    // 弧带
+    ctx.lineCap = 'butt'
+    SEGS.forEach(seg => {
+      const span = seg.a1 - seg.a0
+      ctx.beginPath()
+      ctx.arc(cx, cy, r, rad(seg.a0), rad(seg.a0 + span * reveal))
+      ctx.lineWidth = sw
+      ctx.strokeStyle = seg.c
+      ctx.stroke()
+    })
+
+    // 刻度 + 数字
+    ctx.lineCap = 'round'
+    for (let b = 10; b <= 40; b++) {
+      const a = angleOf(b)
+      const major = b % 5 === 0
+      const rr0 = r + sw / 2 + (major ? 6 : 3)
+      const rr1 = r + sw / 2 + (major ? 26 : 15)
+      const p0 = polar(cx, cy, rr0, a)
+      const p1 = polar(cx, cy, rr1, a)
+      ctx.strokeStyle = major ? 'rgba(142,160,184,0.9)' : 'rgba(142,160,184,0.45)'
+      ctx.lineWidth = major ? 2 : 1
+      ctx.beginPath()
+      ctx.moveTo(p0.x, p0.y)
+      ctx.lineTo(p1.x, p1.y)
+      ctx.stroke()
+      if (major) {
+        const lp = polar(cx, cy, r + sw / 2 + 44, a)
+        ctx.fillStyle = 'rgba(142,160,184,0.85)'
+        ctx.font = '13px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(String(b), lp.x, lp.y)
+      }
+    }
+
+    // 中心枢纽
+    ctx.beginPath(); ctx.arc(cx, cy, 58 * s, 0, TWO_PI)
+    ctx.fillStyle = '#101826'; ctx.fill()
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.5; ctx.stroke()
+    ctx.beginPath(); ctx.arc(cx, cy, 46 * s, 0, TWO_PI)
+    ctx.fillStyle = '#0c1420'; ctx.fill()
+
+    ctx.textAlign = 'center'
+    if (shownValue != null) {
+      ctx.fillStyle = '#eaf2ff'
+      ctx.font = 'bold 34px sans-serif'
+      ctx.textBaseline = 'alphabetic'
+      ctx.fillText(shownValue.toFixed(1), cx, cy - 4)
+      ctx.fillStyle = category.color
+      ctx.font = '600 19px sans-serif'
+      ctx.fillText(category.text, cx, cy + 24)
+    } else {
+      ctx.fillStyle = '#3a4557'
+      ctx.font = 'bold 30px sans-serif'
+      ctx.fillText('--', cx, cy - 6)
+      ctx.fillStyle = '#6b7a90'
+      ctx.font = '16px sans-serif'
+      ctx.fillText(category.text, cx, cy + 20)
+    }
+    // 身高体重摘要：置于中心圆环下方
+    ctx.fillStyle = '#6b7a90'
+    ctx.font = '17px sans-serif'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillText(summary, cx, cy + 74)
+
+    // 白色发光小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
+    if (valid && drawDeg != null) {
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.rotate(drawDeg * Math.PI / 180)
+      const L = 166 * s, baseX = L - 16 * s, hw = 6 * s
+      ctx.shadowColor = 'rgba(255,255,255,0.35)'
+      ctx.shadowBlur = 4 * s
+      ctx.fillStyle = '#ffffff'
+      ctx.beginPath()
+      ctx.moveTo(L, 0)
+      ctx.quadraticCurveTo(L - 6 * s, hw + 2.5 * s, baseX, hw)
+      ctx.quadraticCurveTo(baseX - 4 * s, 0, baseX, -hw)
+      ctx.quadraticCurveTo(L - 6 * s, -hw - 2.5 * s, L, 0)
+      ctx.closePath()
+      ctx.fill()
+      ctx.shadowBlur = 0
+      ctx.restore()
+    }
+  }
+
+  function setSample(h, w) {
+    document.getElementById('heightInput').value = h
+    document.getElementById('weightInput').value = w
+    recalc()
+  }
+
+  document.getElementById('heightInput').addEventListener('input', recalc)
+  document.getElementById('weightInput').addEventListener('input', recalc)
+  recalc()
+</script>
+</body>
+</html>

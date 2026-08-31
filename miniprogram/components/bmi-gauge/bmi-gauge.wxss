@@ -1,0 +1,35 @@
+.bmi-gauge {
+  width: 100%;
+}
+
+.gauge-canvas {
+  width: 100%;
+  aspect-ratio: 520 / 440;
+  display: block;
+  border-radius: 24rpx;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 28rpx;
+  margin-top: 4rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 8rpx;
+  box-shadow: 0 0 8rpx rgba(255, 255, 255, 0.15);
+}
+
+.legend-text {
+  font-size: 22rpx;
+  color: #8ea0b8;
+}

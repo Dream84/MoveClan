@@ -1,0 +1,9 @@
+<view class="bmi-gauge">
+  <canvas type="2d" id="bmiGaugeCanvas" class="gauge-canvas"></canvas>
+  <view class="legend">
+    <view class="legend-item" wx:for="{{legend}}" wx:key="label">
+      <view class="legend-dot" style="background: {{item.color}}"></view>
+      <text class="legend-text">{{item.label}} {{item.range}}</text>
+    </view>
+  </view>
+</view>

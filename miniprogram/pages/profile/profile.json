@@ -3,6 +3,7 @@
   "backgroundTextStyle": "dark",
   "usingComponents": {
     "calendar": "/components/calendar/calendar",
-    "weight-chart": "/components/weight-chart/weight-chart"
+    "weight-chart": "/components/weight-chart/weight-chart",
+    "bmi-gauge": "/components/bmi-gauge/bmi-gauge"
   }
 }

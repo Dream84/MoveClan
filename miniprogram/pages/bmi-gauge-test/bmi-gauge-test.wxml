@@ -1,0 +1,29 @@
+<view class="page">
+  <view class="head">
+    <view class="title">HEALTH METER · 身体质量指数</view>
+    <view class="subtitle">BMI 环形指标 · 按中国成人标准</view>
+    <view class="desc">深色科技医疗风 · 270° 环形仪表，指针随数值平滑转动</view>
+  </view>
+
+  <view class="input-card">
+    <view class="input-row">
+      <text class="input-label">身高</text>
+      <input class="input" type="digit" value="{{heightCm}}" bindinput="onHeightInput" />
+      <text class="input-unit">cm</text>
+    </view>
+    <view class="input-row">
+      <text class="input-label">体重</text>
+      <input class="input" type="digit" value="{{weightKg}}" bindinput="onWeightInput" />
+      <text class="input-unit">kg</text>
+    </view>
+  </view>
+
+  <view class="samples">
+    <view class="sample" data-h="165" data-w="67" bindtap="setSample">默认 165/67</view>
+    <view class="sample" data-h="165" data-w="80" bindtap="setSample">测试 165/80</view>
+  </view>
+
+  <view class="gauge-card">
+    <bmi-gauge heightCm="{{heightCm}}" weightKg="{{weightKg}}" />
+  </view>
+</view>
