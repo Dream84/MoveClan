@@ -55,5 +55,8 @@
   },
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "bmi-gauge": "/components/bmi-gauge/bmi-gauge"
+  },
   "sitemapLocation": "sitemap.json"
 }
