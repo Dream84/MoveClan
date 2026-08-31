@@ -39,11 +39,11 @@
     box-shadow: 0 16px 48px rgba(0,0,0,0.5);
   }
   .gauge-canvas { width: 100%; aspect-ratio: 520 / 440; display: block; border-radius: 12px; }
-  .legend { display: flex; justify-content: center; gap: 18px; margin-top: 2px; }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 2px; }
   .legend-item { display: flex; align-items: center; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; margin-right: 5px;
     box-shadow: 0 0 6px rgba(255,255,255,0.15); }
-  .legend-text { font-size: 12px; color: #8ea0b8; }
+  .legend-text { font-size: 11px; color: #8ea0b8; white-space: nowrap; }
 </style>
 </head>
 <body>

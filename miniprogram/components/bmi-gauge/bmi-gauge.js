@@ -69,6 +69,7 @@ Component({
       if (!valid) {
         this._bmi = null
         this._category = { text: '待录入', color: '#6b7a90' }
+        this._drawValue = null
         this._animate({ bmi: null, deg: 135, reveal: !!first })
         return
       }
