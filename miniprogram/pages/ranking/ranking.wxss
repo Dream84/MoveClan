@@ -183,17 +183,20 @@
   box-shadow: 0 12rpx 32rpx rgba(255, 106, 61, 0.4);
 }
 
+.my-rank-left {
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
 .my-rank-value {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display: block;
+  line-height: 1.2;
   text-align: right;
   flex-shrink: 1;
   margin-left: 16rpx;
   font-size: 24rpx;
   font-weight: 400;
   opacity: 0.95;
-  line-height: 1.4;
 }
 
 .goto-btn {

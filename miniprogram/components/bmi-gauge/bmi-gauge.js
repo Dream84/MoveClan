@@ -46,15 +46,27 @@ Component({
       const tryIt = n => {
         wx.createSelectorQuery().in(this).select('#bmiGaugeCanvas').fields({ node: true, size: true }).exec(res => {
           const info = res && res[0]
-          if (info && info.node && info.width > 0) {
-            this._canvas = info.node
-            this._ctx = info.node.getContext('2d')
-            this._w = info.width
-            this._h = info.height
-            if (cb) cb()
-          } else if (n < 20) {
-            setTimeout(() => tryIt(n + 1), 80)
+          if (!info || !info.node) {
+            if (n < 20) setTimeout(() => tryIt(n + 1), 80)
+            return
           }
+          const node = info.node
+          let w = info.width
+          let h = info.height
+          if (h <= 0) {
+            // aspect-ratio 未生效时按 520:440 比例兜底设置高度，避免画布为 0 显示空白
+            h = Math.round(w * 440 / 520)
+            try {
+              node.style.height = h + 'px'
+            } catch (e) {
+              console.error('[bmi-gauge:setHeight]', e)
+            }
+          }
+          this._canvas = node
+          this._ctx = node.getContext('2d')
+          this._w = w
+          this._h = h
+          if (cb) cb()
         })
       }
       tryIt(0)

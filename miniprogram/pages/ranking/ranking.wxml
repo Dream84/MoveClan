@@ -81,10 +81,10 @@
   </view>
 
   <view class="my-rank-bar" wx:if="{{currentGroup}}">
-    <text wx:if="{{myRank > 0}}">我的排名：第 {{myRank}} 名</text>
-    <text wx:else>我的排名：未上榜</text>
-    <text wx:if="{{myData}}" class="my-rank-value">
+    <view class="my-rank-left" wx:if="{{myRank > 0}}">我的排名：第 {{myRank}} 名</view>
+    <view class="my-rank-left" wx:else>我的排名：未上榜</view>
+    <view class="my-rank-value" wx:if="{{myData}}">
       {{myData.count}}次 · {{myData.totalCalories}}千卡 · {{myData.totalDuration}}分钟
-    </text>
+    </view>
   </view>
 </view>
