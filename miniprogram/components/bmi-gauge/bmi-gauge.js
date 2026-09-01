@@ -17,7 +17,8 @@ function polar(cx, cy, radius, deg) {
 Component({
   properties: {
     heightCm: { type: Number, value: 0 },
-    weightKg: { type: Number, value: 0 }
+    weightKg: { type: Number, value: 0 },
+    dimmed: { type: Boolean, value: false }
   },
 
   data: {
@@ -32,6 +33,9 @@ Component({
   observers: {
     'heightCm, weightKg': function () {
       this._recalc()
+    },
+    dimmed: function (v) {
+      if (!v) this._render()
     }
   },
 
