@@ -17,8 +17,7 @@ function polar(cx, cy, radius, deg) {
 Component({
   properties: {
     heightCm: { type: Number, value: 0 },
-    weightKg: { type: Number, value: 0 },
-    dimmed: { type: Boolean, value: false }
+    weightKg: { type: Number, value: 0 }
   },
 
   data: {
@@ -33,36 +32,41 @@ Component({
   observers: {
     'heightCm, weightKg': function () {
       this._recalc()
-    },
-    dimmed: function (v) {
-      if (!v) this._render()
     }
   },
 
   lifetimes: {
     ready() {
-      // legacy canvas：无需 node，最可靠
-      this._ctx = wx.createCanvasContext('bmiGaugeCanvas', this)
-      this._ensureSize(() => this._recalc(true))
+      this._ensureCanvas(() => this._recalc(true))
     }
   },
 
   methods: {
-    _ensureSize(cb) {
+    _ensureCanvas(cb) {
       const tryIt = n => {
-        wx.createSelectorQuery().in(this).select('.gauge-canvas').boundingClientRect().exec(res => {
-          const rect = res && res[0]
-          if (rect && rect.width > 0 && rect.height > 0) {
-            this._w = rect.width
-            this._h = rect.height
-            if (cb) cb()
-          } else if (n < 20) {
-            setTimeout(() => tryIt(n + 1), 80)
-          } else {
-            this._w = (wx.getSystemInfoSync().windowWidth || 375) - 32
-            this._h = Math.round(this._w * 440 / 520)
-            if (cb) cb()
+        const q = wx.createSelectorQuery().in(this)
+        q.select('#bmiGaugeCanvas').fields({ node: true })
+        q.select('#bmiGaugeCanvas').boundingClientRect()
+        q.exec(res => {
+          const info = res && res[0]
+          const rect = res && res[1]
+          if (!info || !info.node) {
+            if (n < 20) setTimeout(() => tryIt(n + 1), 80)
+            return
           }
+          let w = rect && rect.width
+          let h = rect && rect.height
+          if (!(w > 0)) {
+            w = (wx.getSystemInfoSync().windowWidth || 375) - 32
+          }
+          if (!(h > 0)) {
+            h = Math.round(w * 440 / 520)
+          }
+          this._canvas = info.node
+          this._ctx = info.node.getContext('2d')
+          this._w = w
+          this._h = h
+          if (cb) cb()
         })
       }
       tryIt(0)
@@ -126,15 +130,21 @@ Component({
       const w = this._w
       const h = this._h
       if (!ctx || !w || !h) return
+      const dpr = (wx.getSystemInfoSync().pixelRatio) || 2
+      if (this._canvas.width !== w * dpr) {
+        this._canvas.width = w * dpr
+        this._canvas.height = h * dpr
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, w, h)
 
-      // 背景
+      // 背景（画布坐标）
       ctx.beginPath()
       this._roundRect(ctx, 0, 0, w, h, Math.min(22, h * 0.06))
       ctx.fillStyle = '#ffffff'
       ctx.fill()
 
-      // 等比缩放居中
+      // 等比缩放居中：设计坐标 520x440 完整映射到画布
       const s = Math.min(w / DESIGN.w, h / DESIGN.h)
       ctx.save()
       ctx.translate(w / 2, h / 2)
@@ -142,8 +152,6 @@ Component({
       ctx.translate(-DESIGN.cx, -DESIGN.cy)
       this._drawGauge(ctx)
       ctx.restore()
-
-      ctx.draw()
     },
 
     _drawGauge(ctx) {
@@ -152,6 +160,7 @@ Component({
       const TWO_PI = Math.PI * 2
 
       const reveal = this._drawReveal != null ? this._drawReveal : 1
+      // 弧带（入场按 reveal 渐进扫出）
       ctx.lineCap = 'butt'
       SEGS.forEach(seg => {
         const span = seg.a1 - seg.a0
@@ -162,6 +171,7 @@ Component({
         ctx.stroke()
       })
 
+      // 刻度 + 数字标签（10-40）
       ctx.lineCap = 'round'
       for (let b = 10; b <= 40; b++) {
         const a = angleOf(b)
@@ -186,6 +196,7 @@ Component({
         }
       }
 
+      // 中心枢纽（双层圆环，浅色）
       ctx.beginPath()
       ctx.arc(cx, cy, 58, 0, TWO_PI)
       ctx.fillStyle = '#f3f5f9'
@@ -217,11 +228,13 @@ Component({
         ctx.fillText(this._category.text, cx, cy + 26)
       }
 
+      // 身高体重摘要：置于中心圆环下方，字号略小于 BMI 值
       ctx.fillStyle = '#5a6478'
       ctx.font = 'bold 28px sans-serif'
       ctx.textBaseline = 'alphabetic'
       ctx.fillText(this._summary, cx, cy + 82)
 
+      // 深色小箭头（鼠标光标大小的弧线三角，尖端贴近弧带内缘）
       if (this._valid && this._drawDeg != null) {
         ctx.save()
         ctx.translate(cx, cy)
@@ -229,7 +242,8 @@ Component({
         const L = 166
         const baseX = L - 16
         const hw = 6
-        ctx.setShadow(0, 0, 4, 'rgba(0,0,0,0.28)')
+        ctx.shadowColor = 'rgba(0,0,0,0.28)'
+        ctx.shadowBlur = 4
         ctx.fillStyle = '#1f2d3d'
         ctx.beginPath()
         ctx.moveTo(L, 0)
@@ -238,7 +252,7 @@ Component({
         ctx.quadraticCurveTo(L - 6, -hw - 2.5, L, 0)
         ctx.closePath()
         ctx.fill()
-        ctx.setShadow(0, 0, 0, 'rgba(0,0,0,0)')
+        ctx.shadowBlur = 0
         ctx.restore()
       }
     },
