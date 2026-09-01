@@ -4,6 +4,7 @@
   "description": "群动态分页列表（含点赞/评论信息）",
   "main": "index.js",
   "dependencies": {
+    "cache": "~2.3.1",
     "wx-server-sdk": "~2.6.3"
   }
 }
