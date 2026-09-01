@@ -1,5 +1,5 @@
 <view class="bmi-gauge">
-  <canvas canvas-id="bmiGaugeCanvas" class="gauge-canvas"></canvas>
+  <canvas canvas-id="bmiGaugeCanvas" class="gauge-canvas" hidden="{{dimmed}}"></canvas>
   <view class="legend">
     <view class="legend-item" wx:for="{{legend}}" wx:key="label">
       <view class="legend-dot" style="background: {{item.color}}"></view>
