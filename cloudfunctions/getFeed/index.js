@@ -71,13 +71,13 @@ function sortComments(comments) {
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
-  const page = Math.max(0, Number(event.page) || 0)
+  const skip = Math.max(0, Number(event.skip) || 0)
   const pageSize = Math.min(50, Math.max(1, Number(event.pageSize) || 5))
   if (!groupId) {
     return { code: 1, message: '参数错误' }
   }
 
-  const cacheKey = `feed:${groupId}:${page}:${pageSize}`
+  const cacheKey = `feed:${groupId}:${skip}:${pageSize}`
   if (event.refresh !== true) {
     const hit = cacheStore.get(cacheKey)
     if (hit) {
@@ -99,7 +99,7 @@ exports.main = async (event) => {
     const res = await db.collection('checkins')
       .where({ groupId })
       .orderBy('createTime', 'desc')
-      .skip(page * pageSize)
+      .skip(skip)
       .limit(pageSize)
       .get()
     const rows = res.data || []
@@ -181,7 +181,7 @@ exports.main = async (event) => {
     const data = {
       list,
       hasMore: rows.length === pageSize,
-      page
+      skip
     }
     cacheStore.put(cacheKey, data)
 

@@ -12,7 +12,7 @@ Page({
     currentGroup: null,
     selectedGroupId: '',
     list: [],
-    page: 0,
+    nextSkip: 0,
     hasMore: true,
     loading: true,
     feedLoading: false,
@@ -86,12 +86,13 @@ Page({
       this.setData({ list: [], hasMore: false })
       return Promise.resolve()
     }
-    const page = reset ? 0 : this.data.page
+    const skip = reset ? 0 : this.data.nextSkip
+    const pageSize = reset ? settings.FEED_FIRST_PAGE_SIZE : settings.FEED_PAGE_SIZE
     if (this.data.feedLoading) return Promise.resolve()
     const reqId = ++this._feedReqId
     const reqGroupId = group._id
     this.setData({ feedLoading: true })
-    return api.call('getFeed', { groupId: reqGroupId, page, pageSize: settings.FEED_PAGE_SIZE, refresh: !!reset }, { loading: false })
+    return api.call('getFeed', { groupId: reqGroupId, skip, pageSize, refresh: !!reset }, { loading: false })
       .then(data => {
         if (reqId !== this._feedReqId || !this.data.currentGroup || this.data.currentGroup._id !== reqGroupId) return
         const rows = (data.list || []).map(item => ({
@@ -104,7 +105,7 @@ Page({
         }))
         this.setData({
           list: reset ? rows : this.data.list.concat(rows),
-          page: page + 1,
+          nextSkip: skip + rows.length,
           hasMore: data.hasMore
         })
       })
