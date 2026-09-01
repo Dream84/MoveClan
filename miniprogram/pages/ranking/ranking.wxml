@@ -13,10 +13,20 @@
       bindtap="onPeriodChange"
     >本周</view>
     <view
+      class="tab {{period === 'lastWeek' ? 'active' : ''}}"
+      data-period="lastWeek"
+      bindtap="onPeriodChange"
+    >上周</view>
+    <view
       class="tab {{period === 'month' ? 'active' : ''}}"
       data-period="month"
       bindtap="onPeriodChange"
     >本月</view>
+    <view
+      class="tab {{period === 'lastMonth' ? 'active' : ''}}"
+      data-period="lastMonth"
+      bindtap="onPeriodChange"
+    >上月</view>
   </view>
 
   <view class="sorts">
@@ -53,7 +63,7 @@
         </view>
       </view>
     </block>
-    <view wx:elif="{{!list.length}}" class="empty-tip">本周/本月暂无打卡数据</view>
+    <view wx:elif="{{!list.length}}" class="empty-tip">{{emptyText}}</view>
     <view
       class="rank-item {{item.isMe ? 'me' : ''}}"
       wx:for="{{list}}"

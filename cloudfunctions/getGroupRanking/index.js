@@ -41,12 +41,22 @@ function todayCN() {
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
   const lastDay = new Date(Number(parts[0]), Number(parts[1]), 0).getDate()
+  const lwMonday = new Date(monday)
+  lwMonday.setDate(monday.getDate() - 7)
+  const lwSunday = new Date(sunday)
+  lwSunday.setDate(sunday.getDate() - 7)
+  const lmStart = new Date(Number(parts[0]), Number(parts[1]) - 2, 1)
+  const lmEnd = new Date(Number(parts[0]), Number(parts[1]) - 1, 0)
   return {
     today: s,
     weekStart: `${monday.getFullYear()}-${pad(monday.getMonth() + 1)}-${pad(monday.getDate())}`,
     weekEnd: `${sunday.getFullYear()}-${pad(sunday.getMonth() + 1)}-${pad(sunday.getDate())}`,
+    lastWeekStart: `${lwMonday.getFullYear()}-${pad(lwMonday.getMonth() + 1)}-${pad(lwMonday.getDate())}`,
+    lastWeekEnd: `${lwSunday.getFullYear()}-${pad(lwSunday.getMonth() + 1)}-${pad(lwSunday.getDate())}`,
     monthStart: `${parts[0]}-${parts[1]}-01`,
-    monthEnd: `${parts[0]}-${parts[1]}-${pad(lastDay)}`
+    monthEnd: `${parts[0]}-${parts[1]}-${pad(lastDay)}`,
+    lastMonthStart: `${lmStart.getFullYear()}-${pad(lmStart.getMonth() + 1)}-01`,
+    lastMonthEnd: `${lmEnd.getFullYear()}-${pad(lmEnd.getMonth() + 1)}-${pad(lmEnd.getDate())}`
   }
 }
 
@@ -99,7 +109,7 @@ async function resolveAvatarUrls(rows) {
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
-  const period = event.period === 'month' ? 'month' : 'week'
+  const period = ['week', 'lastWeek', 'month', 'lastMonth'].indexOf(event.period) >= 0 ? event.period : 'week'
   const sortBy = ['count', 'calories', 'duration'].indexOf(event.sortBy) >= 0 ? event.sortBy : 'count'
   const sortField = SORT_FIELDS[sortBy]
   if (!groupId) {
@@ -139,8 +149,14 @@ exports.main = async (event) => {
     }
 
     const range = todayCN()
-    const start = period === 'week' ? range.weekStart : range.monthStart
-    const end = period === 'week' ? range.weekEnd : range.monthEnd
+    const RANGE_MAP = {
+      week: ['weekStart', 'weekEnd'],
+      lastWeek: ['lastWeekStart', 'lastWeekEnd'],
+      month: ['monthStart', 'monthEnd'],
+      lastMonth: ['lastMonthStart', 'lastMonthEnd']
+    }
+    const start = range[RANGE_MAP[period][0]]
+    const end = range[RANGE_MAP[period][1]]
 
     const rows = await fetchAll({
       groupId,

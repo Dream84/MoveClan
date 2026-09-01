@@ -3,6 +3,8 @@ const constants = require('../../utils/constants')
 
 const app = getApp()
 
+const PERIOD_TEXT = { week: '本周', lastWeek: '上周', month: '本月', lastMonth: '上月' }
+
 Page({
   data: {
     groups: [],
@@ -12,7 +14,8 @@ Page({
     period: 'week',
     sortBy: 'count',
     sortLabels: ['打卡次数', '消耗卡路里', '运动时长'],
-    periodLabels: ['本周', '本月'],
+    periodLabels: ['本周', '上周', '本月', '上月'],
+    emptyText: '本周暂无打卡数据',
     list: [],
     myRank: 0,
     myData: null,
@@ -109,7 +112,7 @@ Page({
   onPeriodChange(e) {
     const period = e.currentTarget.dataset.period
     if (period === this.data.period) return
-    this.setData({ period })
+    this.setData({ period, emptyText: (PERIOD_TEXT[period] || '本周') + '暂无打卡数据' })
     this.loadRanking()
   },
 
