@@ -10,7 +10,7 @@
     <view class="edit-btn" bindtap="openEdit">编辑资料</view>
   </view>
 
-  <view class="bmi-card">
+  <view class="bmi-card" wx:if="{{!showEdit}}">
     <bmi-gauge
       heightCm="{{userInfo.heightCm >= 50 ? userInfo.heightCm : 170}}"
       weightKg="{{userInfo.weightKg >= 20 ? userInfo.weightKg : 50}}"
