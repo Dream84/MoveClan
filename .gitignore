@@ -6,4 +6,4 @@ node_modules/
 .settings/
 .vscode/
 *.config.js
-*.logo1.png
+logo1.png
