@@ -54,6 +54,9 @@ exports.main = async (event) => {
       }
     }
   } catch (err) {
+    if (err && err.errCode === -502004) {
+      return { code: 2, message: '动态不存在' }
+    }
     console.error('[likeCheckin]', err)
     return { code: 500, message: '操作失败，请重试' }
   }

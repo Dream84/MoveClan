@@ -121,7 +121,7 @@ exports.main = async (event) => {
 
     return { code: 0, message: 'ok', data: {} }
   } catch (err) {
-    if (err && (err.errCode === -502004 || err.errCode === -1)) {
+    if (err && err.errCode === -502004) {
       return { code: 2, message: '记录不存在' }
     }
     console.error('[updateCheckin]', err)

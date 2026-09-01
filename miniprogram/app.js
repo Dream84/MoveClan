@@ -55,7 +55,7 @@ App({
   },
 
   login(force) {
-    if (this._loginPromise) return this._loginPromise
+    if (!force && this._loginPromise) return this._loginPromise
     if (!force && this.globalData.userInfo && this.globalData.userInfo.openid) {
       return Promise.resolve(this.globalData.userInfo)
     }

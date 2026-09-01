@@ -3,7 +3,7 @@
     <view
       class="piece shape-{{item.shape}}"
       wx:for="{{pieces}}"
-      wx:key="*this"
+      wx:key="key"
       style="left: {{item.left}}%; width: {{item.size}}rpx; height: {{item.size}}rpx; background: {{item.color}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s;"
     ></view>
   </view>

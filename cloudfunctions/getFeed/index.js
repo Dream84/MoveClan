@@ -38,6 +38,14 @@ async function loadUsers(openids) {
       }
     })
   }
+  // 上限保护：清理过期项，仍超限则整体清空（缓存可重建）
+  if (userCache.size > 500) {
+    const now = Date.now()
+    userCache.forEach((v, k) => {
+      if (now - v.ts > USER_CACHE_TTL) userCache.delete(k)
+    })
+    if (userCache.size > 500) userCache.clear()
+  }
   return map
 }
 

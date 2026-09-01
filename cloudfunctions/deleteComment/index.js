@@ -43,6 +43,9 @@ exports.main = async (event) => {
 
     return { code: 0, message: 'ok', data: {} }
   } catch (err) {
+    if (err && err.errCode === -502004) {
+      return { code: 2, message: '动态不存在' }
+    }
     console.error('[deleteComment]', err)
     return { code: 500, message: '删除失败，请重试' }
   }

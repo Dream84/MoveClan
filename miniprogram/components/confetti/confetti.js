@@ -16,6 +16,7 @@ Component({
         const pieces = []
         for (let i = 0; i < 18; i++) {
           pieces.push({
+            key: 'p' + i,
             left: Math.floor(Math.random() * 100),
             delay: (Math.random() * 1.2).toFixed(2),
             duration: (2 + Math.random() * 1.5).toFixed(2),

@@ -67,8 +67,12 @@ exports.main = async (event) => {
       data: { comments: _.push(comment) }
     })
 
-    return { code: 0, message: 'ok', data: { comment } }
+    const responseComment = Object.assign({}, comment, { createTime: Date.now() })
+    return { code: 0, message: 'ok', data: { comment: responseComment } }
   } catch (err) {
+    if (err && err.errCode === -502004) {
+      return { code: 2, message: '动态不存在' }
+    }
     console.error('[commentCheckin]', err)
     return { code: 500, message: '评论失败，请重试' }
   }

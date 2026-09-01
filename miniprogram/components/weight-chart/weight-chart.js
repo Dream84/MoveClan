@@ -41,7 +41,9 @@ Component({
       if (period === 'week') return 7
       if (period === 'month') {
         const p = anchor.split('-')
-        return new Date(Number(p[0]), Number(p[1]), 0).getDate()
+        const m = Number(p[1])
+        if (!m) return 31
+        return new Date(Number(p[0]), m, 0).getDate()
       }
       return 12
     },
@@ -116,7 +118,7 @@ Component({
     render(canvas, w, h) {
       const ctx = canvas.getContext('2d')
       this._canvasW = w
-      const dpr = (wx.getSystemInfoSync().pixelRatio) || 2
+      const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2
       canvas.width = w * dpr
       canvas.height = h * dpr
       ctx.scale(dpr, dpr)

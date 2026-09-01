@@ -57,7 +57,8 @@ Component({
           let w = rect && rect.width
           let h = rect && rect.height
           if (!(w > 0)) {
-            w = (wx.getSystemInfoSync().windowWidth || 375) - 32
+            w = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).windowWidth || 375
+            w = w - 32
           }
           if (!(h > 0)) {
             h = Math.round(w * 440 / 520)
@@ -130,7 +131,7 @@ Component({
       const w = this._w
       const h = this._h
       if (!ctx || !w || !h) return
-      const dpr = (wx.getSystemInfoSync().pixelRatio) || 2
+      const dpr = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2
       if (this._canvas.width !== w * dpr) {
         this._canvas.width = w * dpr
         this._canvas.height = h * dpr

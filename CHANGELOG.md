@@ -2,7 +2,30 @@
 
 本项目为微信小程序 + 云开发应用。每个版本条目列出「变更内容」与「重新部署需要进行的操作」。
 
-## v1.10.4 — 代码审查修复（2026-08-31，工作区，待提交）
+## v1.10.5 — 剩余优化点修复（2026-08-31，工作区，待提交）
+
+### 变更内容
+- **云函数**
+  - `likeCheckin` / `commentCheckin` / `deleteComment`：记录不存在时由 500 修正为 `code:2`；
+  - `commentCheckin`：返回真实 `createTime`（替代 serverDate 占位）；
+  - `updateCheckin`：移除把通用错误 `-1` 误判为「记录不存在」；
+  - `leaveGroup`：非成员返回 `code:3`（对齐约定）；
+  - `getMyStats`：里程碑写入失败不再阻断统计响应（隔离 try/catch）；
+  - `getFeed`：`userCache` 增加上限保护（超限清理/清空）。
+- **前端**
+  - 清除 `avatarSrc` 无用的第二个参数；
+  - `calendar`/`confetti` 的 `wx:key` 改用稳定 key（date/index）；
+  - `weight-chart`/`bmi-gauge` 的 `getSystemInfoSync` 改为 `getWindowInfo` 兼容；
+  - `weight-chart` 月周期空锚点守卫；
+  - `app.login(force)` 修正：`force` 时真正强制重新拉取（不再被缓存 Promise 短路）。
+
+### 重新部署需要进行的操作
+1. 云函数（云端安装依赖）：重部署 `likeCheckin`、`commentCheckin`、`deleteComment`、`updateCheckin`、`leaveGroup`、`getMyStats`、`getFeed`
+2. 前端：重新编译小程序
+
+---
+
+## v1.10.4 — 代码审查修复（2026-08-31，commit 1a55c57）
 
 ### 变更内容
 **云函数**

@@ -57,7 +57,7 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
-        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl),
         trendAnchor: this.data.trendAnchor || this.currentAnchor(this.data.trendPeriod)
       })
       this.syncTrendNav()
@@ -297,7 +297,7 @@ Page({
       app.setUserInfo(user)
       this.setData({
         userInfo: user,
-        avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
+        avatarDisplay: api.avatarSrc(user.avatarUrl),
         showEdit: false
       })
       await this.loadWeight()

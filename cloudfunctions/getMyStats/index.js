@@ -164,13 +164,17 @@ exports.main = async (event) => {
     const newMilestones = ACHIEVEMENT_DAYS.filter(m => streakInfo.streak >= m && achieved.indexOf(m) < 0)
 
     if ((streakInfo.streak > prevMax || newMilestones.length) && user) {
-      const mergedMilestones = Array.from(new Set(achieved.concat(newMilestones)))
-      await db.collection('users').doc(user._id).update({
-        data: {
-          maxStreakDays: Math.max(prevMax, streakInfo.streak),
-          achievedMilestones: mergedMilestones
-        }
-      })
+      try {
+        const mergedMilestones = Array.from(new Set(achieved.concat(newMilestones)))
+        await db.collection('users').doc(user._id).update({
+          data: {
+            maxStreakDays: Math.max(prevMax, streakInfo.streak),
+            achievedMilestones: mergedMilestones
+          }
+        })
+      } catch (e) {
+        console.error('[getMyStats:milestone]', e)
+      }
     }
 
     const data = {

@@ -42,6 +42,7 @@ Component({
         const date = `${year}-${dateUtil.pad(month)}-${dateUtil.pad(d)}`
         const count = countMap[date] || 0
         cells.push({
+          key: date,
           day: d,
           date,
           isToday: date === todayStr,

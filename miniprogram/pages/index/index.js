@@ -66,7 +66,7 @@ Page({
       }
       this.setData({
         userInfo: app.globalData.userInfo,
-        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl, 200),
+        avatarDisplay: api.avatarSrc(app.globalData.userInfo && app.globalData.userInfo.avatarUrl),
         showProfileTip: isDefaultProfile(app.globalData.userInfo),
         greeting: greeting()
       })
@@ -205,7 +205,7 @@ Page({
       app.setUserInfo(user)
       this.setData({
         userInfo: user,
-        avatarDisplay: api.avatarSrc(user.avatarUrl, 200),
+        avatarDisplay: api.avatarSrc(user.avatarUrl),
         showProfileTip: false
       })
       wx.showToast({ title: '已使用微信资料', icon: 'success' })

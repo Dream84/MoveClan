@@ -17,7 +17,7 @@
 
   <view class="cal-grid">
     <view class="cal-row" wx:for="{{weeks}}" wx:key="*this" wx:for-item="week">
-      <view class="cal-cell" wx:for="{{week}}" wx:key="*this" wx:for-item="cell">
+      <view class="cal-cell" wx:for="{{week}}" wx:key="key" wx:for-item="cell">
         <view wx:if="{{cell}}" class="cal-day level-{{cell.level}} {{cell.isToday ? 'today' : ''}}">
           {{cell.day}}
         </view>

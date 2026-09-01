@@ -24,7 +24,7 @@ exports.main = async (event) => {
       .where({ groupId, openid: OPENID })
       .get()
     if (me.data.length === 0) {
-      return { code: 4, message: '你不是该群成员' }
+      return { code: 3, message: '你不是该群成员' }
     }
 
     if (me.data[0].role === 'owner') {
