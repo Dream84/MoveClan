@@ -170,7 +170,7 @@
   position: fixed;
   left: 24rpx;
   right: 24rpx;
-  bottom: 96rpx;
+  bottom: calc(96rpx + env(safe-area-inset-bottom));
   background: linear-gradient(135deg, #FF9A62, #FF6A3D);
   color: #FFFFFF;
   border-radius: 48rpx;

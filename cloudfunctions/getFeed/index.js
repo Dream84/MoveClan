@@ -77,7 +77,7 @@ exports.main = async (event) => {
     return { code: 1, message: '参数错误' }
   }
 
-  const cacheKey = `feed:${groupId}:${skip}:${pageSize}`
+  const cacheKey = `feed:${groupId}:${OPENID}:${skip}:${pageSize}`
   if (event.refresh !== true) {
     const hit = cacheStore.get(cacheKey)
     if (hit) {

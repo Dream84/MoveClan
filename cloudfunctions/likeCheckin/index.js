@@ -41,8 +41,18 @@ exports.main = async (event) => {
       })
     }
 
-    const likeCount = Math.max(0, (doc.likeCount || 0) + (liked ? -1 : 1))
-    return { code: 0, message: 'ok', data: { liked: !liked, likeCount } }
+    // 重读最新状态返回，避免并发 toggle 造成计数漂移
+    const after = await db.collection('checkins').doc(checkinId).get()
+    const doc2 = after.data
+    const finalLiked = (doc2.likeOpenids || []).indexOf(OPENID) >= 0
+    return {
+      code: 0,
+      message: 'ok',
+      data: {
+        liked: finalLiked,
+        likeCount: (doc2.likeOpenids || []).length
+      }
+    }
   } catch (err) {
     console.error('[likeCheckin]', err)
     return { code: 500, message: '操作失败，请重试' }

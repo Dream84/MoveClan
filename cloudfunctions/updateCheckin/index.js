@@ -85,6 +85,9 @@ exports.main = async (event) => {
     if (!doc || doc.openid !== OPENID) {
       return { code: 3, message: '无权编辑该记录' }
     }
+    if (v.groupId !== doc.groupId) {
+      return { code: 4, message: '打卡记录不能跨群搬移' }
+    }
 
     const member = await db.collection('group_members')
       .where({ groupId: v.groupId, openid: OPENID })

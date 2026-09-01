@@ -120,6 +120,7 @@ Page({
       groups,
       groupLabel: group ? group.name : '',
       checkDate: r.checkDate,
+      dateStart: dateUtil.addDays(r.checkDate, -7),
       sportIndex,
       estimateHint: buildHint(sport),
       duration: String(r.duration),

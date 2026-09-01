@@ -71,7 +71,9 @@ module.exports = {
 
   RANK_PERIODS: [
     { value: 'week', label: '本周' },
-    { value: 'month', label: '本月' }
+    { value: 'lastWeek', label: '上周' },
+    { value: 'month', label: '本月' },
+    { value: 'lastMonth', label: '上月' }
   ],
 
   ACHIEVEMENT_DAYS: [7, 14, 30],

@@ -88,7 +88,7 @@ Page({
     }
     const skip = reset ? 0 : this.data.nextSkip
     const pageSize = reset ? settings.FEED_FIRST_PAGE_SIZE : settings.FEED_PAGE_SIZE
-    if (this.data.feedLoading) return Promise.resolve()
+    if (this.data.feedLoading && !reset) return Promise.resolve()
     const reqId = ++this._feedReqId
     const reqGroupId = group._id
     this.setData({ feedLoading: true })
@@ -121,7 +121,8 @@ Page({
     const index = Number(e.detail.value)
     const group = this.data.groups[index]
     if (!group) return
-    this.setData({ groupIndex: index, currentGroup: group, selectedGroupId: group._id })
+    this._feedReqId++
+    this.setData({ groupIndex: index, currentGroup: group, selectedGroupId: group._id, list: [], hasMore: true })
     this.loadFeed(true)
   },
 
@@ -169,8 +170,9 @@ Page({
   },
 
   onCommentBlur() {
-    // 输入法框关闭（失焦）时自动取消评论栏；留 200ms 让「发送」点击先执行
+    // 输入法框关闭（失焦）时自动取消评论栏；发送中则跳过，避免打断发送
     setTimeout(() => {
+      if (this._submittingComment) return
       if (this.data.commentTarget) {
         this.setData({ commentTarget: null, commentText: '', commentFocus: false })
         this.showTab()
@@ -235,6 +237,7 @@ Page({
       wx.showToast({ title: '请输入评论', icon: 'none' })
       return
     }
+    this._submittingComment = true
     try {
       const res = await api.call('commentCheckin', { checkinId: item._id, content }, { loadingText: '发送中...' })
       if (res && res.comment) {
@@ -254,6 +257,8 @@ Page({
       this.showTab()
     } catch (err) {
       console.error('[feed.comment]', err)
+    } finally {
+      this._submittingComment = false
     }
   },
 

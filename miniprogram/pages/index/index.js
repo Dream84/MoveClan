@@ -121,7 +121,7 @@ Page({
       return
     }
     const page = reset ? 0 : this.data.recentPage
-    if (this.data.recentLoading) return
+    if (this.data.recentLoading && !reset) return
     const reqGroupId = group._id
     this.setData({ recentLoading: true })
     try {
@@ -152,9 +152,7 @@ Page({
     } catch (err) {
       console.error('[index.loadRecent]', err)
     } finally {
-      if (this.data.currentGroup && this.data.currentGroup._id === reqGroupId) {
-        this.setData({ recentLoading: false })
-      }
+      this.setData({ recentLoading: false })
     }
   },
 
@@ -197,7 +195,13 @@ Page({
         const up = await api.uploadImage(userInfo.avatarUrl, app.globalData.openid, null)
         avatarUrl = up.fileID
       }
-      const user = await api.call('login', { nickName: userInfo.nickName, avatarUrl }, { loading: false })
+      const u = app.globalData.userInfo || {}
+      const user = await api.call('login', {
+        nickName: userInfo.nickName,
+        avatarUrl,
+        weightKg: Number(u.weightKg) || 0,
+        heightCm: Number(u.heightCm) || 0
+      }, { loading: false })
       app.setUserInfo(user)
       this.setData({
         userInfo: user,

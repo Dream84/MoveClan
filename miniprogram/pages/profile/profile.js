@@ -84,6 +84,8 @@ Page({
   },
 
   async loadMonthDays(year, month) {
+    if (!this._calReqId) this._calReqId = 0
+    const reqId = ++this._calReqId
     const db = wx.cloud.database()
     const _ = db.command
     const range = dateUtil.getMonthRange(`${year}-${dateUtil.pad(month)}-01`)
@@ -106,6 +108,7 @@ Page({
       if (!res.data || res.data.length < 20) break
       offset += 20
     }
+    if (reqId !== this._calReqId) return
     const calValue = Object.keys(countMap)
       .sort()
       .map(date => ({ date, count: countMap[date] }))

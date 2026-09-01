@@ -1,3 +1,5 @@
+<view class="page-loading" wx:if="{{loading && !group}}">加载中...</view>
+
 <view class="page" wx:if="{{group}}">
   <view class="detail-card card">
     <view class="detail-head">

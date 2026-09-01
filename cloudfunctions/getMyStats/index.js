@@ -127,8 +127,10 @@ exports.main = async (event) => {
         weekCount += c.count
         weekCalories += c.calories
       }
-      monthCount += c.count
-      monthCalories += c.calories
+      if (c.checkDate >= range.monthStart) {
+        monthCount += c.count
+        monthCalories += c.calories
+      }
     })
 
     const allRows = await fetchAll({ openid: OPENID }, { openid: true, checkDate: true, count: true, calories: true })

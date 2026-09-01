@@ -7,6 +7,7 @@ Page({
   data: {
     myGroups: [],
     loading: true,
+    submitting: false,
     inviteCode: '',
     showCreate: false,
     createName: '',
@@ -66,12 +67,14 @@ Page({
   },
 
   async doCreate() {
+    if (this.data.submitting) return
     const name = this.data.createName.trim()
     if (!name) {
       wx.showToast({ title: '请输入群名称', icon: 'none' })
       return
     }
     const theme = this.data.themes[this.data.themeIndex].value
+    this.setData({ submitting: true })
     try {
       const data = await api.call('createGroup', {
         name,
@@ -93,6 +96,8 @@ Page({
       this.refresh()
     } catch (err) {
       console.error('[groups.doCreate]', err)
+    } finally {
+      this.setData({ submitting: false })
     }
   },
 
@@ -101,11 +106,13 @@ Page({
   },
 
   async doJoin() {
+    if (this.data.submitting) return
     const code = this.data.inviteCode.trim()
     if (!code) {
       wx.showToast({ title: '请输入邀请码', icon: 'none' })
       return
     }
+    this.setData({ submitting: true })
     try {
       await api.call('joinGroup', { inviteCode: code })
       app.invalidateMyGroups()
@@ -114,6 +121,8 @@ Page({
       this.refresh()
     } catch (err) {
       console.error('[groups.doJoin]', err)
+    } finally {
+      this.setData({ submitting: false })
     }
   },
 

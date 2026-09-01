@@ -143,17 +143,33 @@ function weekRange() {
   return { start: r.start, end: r.end }
 }
 
-function monthRange() {
-  const r = dateUtil.getMonthRange(dateUtil.today())
-  return { start: r.start, end: r.end }
-}
+  function monthRange() {
+    const r = dateUtil.getMonthRange(dateUtil.today())
+    return { start: r.start, end: r.end }
+  }
+
+  function lastWeekRange() {
+    const w = weekRange()
+    return { start: dateUtil.addDays(w.start, -7), end: dateUtil.addDays(w.end, -7) }
+  }
+
+  function lastMonthRange() {
+    const t = new Date()
+    const start = new Date(t.getFullYear(), t.getMonth() - 1, 1)
+    const end = new Date(t.getFullYear(), t.getMonth(), 0)
+    const f = d => `${d.getFullYear()}-${dateUtil.pad(d.getMonth() + 1)}-${dateUtil.pad(d.getDate())}`
+    return { start: f(start), end: f(end) }
+  }
 
 function inRange(dateStr, start, end) {
   return dateStr >= start && dateStr <= end
 }
 
 function aggGroup(groupId, period) {
-  const range = period === 'month' ? monthRange() : weekRange()
+  let range = weekRange()
+  if (period === 'month') range = monthRange()
+  else if (period === 'lastWeek') range = lastWeekRange()
+  else if (period === 'lastMonth') range = lastMonthRange()
   const rows = mockCheckins.filter(c =>
     c.groupId === groupId && inRange(c.checkDate, range.start, range.end)
   )
@@ -253,7 +269,7 @@ const handlers = {
   },
 
   getGroupRanking({ groupId, period, sortBy }) {
-    const period2 = period === 'month' ? 'month' : 'week'
+      const period2 = ['lastWeek', 'lastMonth', 'month'].indexOf(period) >= 0 ? period : 'week'
     const sortField = sortBy === 'calories' ? 'totalCalories' : sortBy === 'duration' ? 'totalDuration' : 'count'
     const list = aggGroup(groupId || 'g1', period2)
     list.sort((a, b) => b[sortField] - a[sortField] || b.count - a.count || a.openid.localeCompare(b.openid))

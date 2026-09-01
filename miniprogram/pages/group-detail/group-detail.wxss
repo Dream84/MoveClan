@@ -4,6 +4,15 @@
   box-sizing: border-box;
 }
 
+.page-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sub);
+  font-size: 26rpx;
+}
+
 .detail-card {
   margin-bottom: 36rpx;
   text-align: center;
