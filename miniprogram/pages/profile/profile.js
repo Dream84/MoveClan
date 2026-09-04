@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const dateUtil = require('../../utils/date')
+const format = require('../../utils/format')
 
 const app = getApp()
 
@@ -21,6 +22,12 @@ Page({
     calMonth: new Date().getMonth() + 1,
     calValue: [],
     weightRecords: [],
+    statsText: {
+      totalCountText: '0',
+      totalCaloriesText: '0',
+      weekLine: '',
+      monthLine: ''
+    },
     statsLoaded: false,
     trendMetric: 'weight',
     trendPeriod: 'day',
@@ -72,7 +79,14 @@ Page({
     this.setData({ statsLoaded: false })
     try {
       const stats = await api.call('getMyStats', { refresh: !!pull }, { loading: false })
-      this.setData({ stats, statsLoaded: true })
+      const fmt = format.compactNumber
+      const statsText = {
+        totalCountText: fmt(stats.totalCount),
+        totalCaloriesText: fmt(stats.totalCalories),
+        weekLine: '本周 ' + fmt(stats.weekCount) + '次 / ' + fmt(stats.weekCalories) + '千卡',
+        monthLine: '本月 ' + fmt(stats.monthCount) + '次 / ' + fmt(stats.monthCalories) + '千卡'
+      }
+      this.setData({ stats, statsText, statsLoaded: true })
     } catch (err) {
       console.error('[profile.loadStats]', err)
       this.setData({ statsLoaded: true })

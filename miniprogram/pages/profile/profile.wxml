@@ -35,11 +35,11 @@
     </view>
     <view class="stats-grid" wx:else>
       <view class="stats-item">
-        <view class="stats-num">{{stats.totalCount}}</view>
+        <view class="stats-num">{{statsText.totalCountText}}</view>
         <view class="stats-label">总打卡次数</view>
       </view>
       <view class="stats-item">
-        <view class="stats-num">{{stats.totalCalories}}</view>
+        <view class="stats-num">{{statsText.totalCaloriesText}}</view>
         <view class="stats-label">总卡路里</view>
       </view>
       <view class="stats-item">
@@ -48,8 +48,8 @@
       </view>
     </view>
     <view class="stats-sub">
-      <text>本周 {{stats.weekCount}}次 / {{stats.weekCalories}}千卡</text>
-      <text>本月 {{stats.monthCount}}次 / {{stats.monthCalories}}千卡</text>
+      <text>{{statsText.weekLine}}</text>
+      <text>{{statsText.monthLine}}</text>
     </view>
   </view>
 
