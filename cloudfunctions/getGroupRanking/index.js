@@ -109,7 +109,7 @@ async function resolveAvatarUrls(rows) {
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const groupId = event.groupId || ''
-  const period = ['week', 'lastWeek', 'month', 'lastMonth'].indexOf(event.period) >= 0 ? event.period : 'week'
+  const period = ['week', 'lastWeek', 'month', 'lastMonth', 'total'].indexOf(event.period) >= 0 ? event.period : 'week'
   const sortBy = ['count', 'calories', 'duration'].indexOf(event.sortBy) >= 0 ? event.sortBy : 'count'
   const sortField = SORT_FIELDS[sortBy]
   if (!groupId) {
@@ -148,20 +148,24 @@ exports.main = async (event) => {
       })
     }
 
-    const range = todayCN()
-    const RANGE_MAP = {
-      week: ['weekStart', 'weekEnd'],
-      lastWeek: ['lastWeekStart', 'lastWeekEnd'],
-      month: ['monthStart', 'monthEnd'],
-      lastMonth: ['lastMonthStart', 'lastMonthEnd']
+    let rows
+    if (period === 'total') {
+      rows = await fetchAll({ groupId })
+    } else {
+      const RANGE_MAP = {
+        week: ['weekStart', 'weekEnd'],
+        lastWeek: ['lastWeekStart', 'lastWeekEnd'],
+        month: ['monthStart', 'monthEnd'],
+        lastMonth: ['lastMonthStart', 'lastMonthEnd']
+      }
+      const range = todayCN()
+      const start = range[RANGE_MAP[period][0]]
+      const end = range[RANGE_MAP[period][1]]
+      rows = await fetchAll({
+        groupId,
+        checkDate: _.gte(start).and(_.lte(end))
+      })
     }
-    const start = range[RANGE_MAP[period][0]]
-    const end = range[RANGE_MAP[period][1]]
-
-    const rows = await fetchAll({
-      groupId,
-      checkDate: _.gte(start).and(_.lte(end))
-    })
 
     const agg = {}
     rows.forEach(c => {
