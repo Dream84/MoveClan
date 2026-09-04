@@ -166,12 +166,15 @@ function inRange(dateStr, start, end) {
 }
 
 function aggGroup(groupId, period) {
-  let range = weekRange()
-  if (period === 'month') range = monthRange()
-  else if (period === 'lastWeek') range = lastWeekRange()
-  else if (period === 'lastMonth') range = lastMonthRange()
+  let range = null
+  if (period !== 'total') {
+    range = weekRange()
+    if (period === 'month') range = monthRange()
+    else if (period === 'lastWeek') range = lastWeekRange()
+    else if (period === 'lastMonth') range = lastMonthRange()
+  }
   const rows = mockCheckins.filter(c =>
-    c.groupId === groupId && inRange(c.checkDate, range.start, range.end)
+    c.groupId === groupId && (!range || inRange(c.checkDate, range.start, range.end))
   )
   const map = {}
   rows.forEach(c => {
@@ -269,7 +272,7 @@ const handlers = {
   },
 
   getGroupRanking({ groupId, period, sortBy }) {
-      const period2 = ['lastWeek', 'lastMonth', 'month'].indexOf(period) >= 0 ? period : 'week'
+      const period2 = ['total', 'lastWeek', 'lastMonth', 'month'].indexOf(period) >= 0 ? period : 'week'
     const sortField = sortBy === 'calories' ? 'totalCalories' : sortBy === 'duration' ? 'totalDuration' : 'count'
     const list = aggGroup(groupId || 'g1', period2)
     list.sort((a, b) => b[sortField] - a[sortField] || b.count - a.count || a.openid.localeCompare(b.openid))

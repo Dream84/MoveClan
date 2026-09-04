@@ -73,7 +73,8 @@ module.exports = {
     { value: 'week', label: '本周' },
     { value: 'lastWeek', label: '上周' },
     { value: 'month', label: '本月' },
-    { value: 'lastMonth', label: '上月' }
+    { value: 'lastMonth', label: '上月' },
+    { value: 'total', label: '总榜' }
   ],
 
   ACHIEVEMENT_DAYS: [7, 14, 30],
