@@ -1,9 +1,10 @@
 const api = require('../../utils/api')
 const constants = require('../../utils/constants')
+const format = require('../../utils/format')
 
 const app = getApp()
 
-const PERIOD_TEXT = { week: '本周', lastWeek: '上周', month: '本月', lastMonth: '上月' }
+const PERIOD_TEXT = { week: '本周', lastWeek: '上周', month: '本月', lastMonth: '上月', total: '总榜' }
 
 Page({
   data: {
@@ -14,7 +15,7 @@ Page({
     period: 'week',
     sortBy: 'count',
     sortLabels: ['打卡次数', '消耗卡路里', '运动时长'],
-    periodLabels: ['本周', '上周', '本月', '上月'],
+    periodLabels: ['本周', '上周', '本月', '上月', '总榜'],
     emptyText: '本周暂无打卡数据',
     list: [],
     myRank: 0,
@@ -86,13 +87,12 @@ Page({
     }, { loading: false })
       .then(data => {
         if (reqId !== this._rankReqId) return
-        const myOpenid = this.data.myOpenid
-        const list = (data.list || []).map(item => ({
-          ...item,
-          isMe: item.openid === myOpenid,
-          medal: item.rank <= 3 ? item.rank : 0
-        }))
-        this.setData({ list, myRank: data.myRank, myData: data.myData })
+        const list = (data.list || []).map(item => this.decorate(item))
+        this.setData({
+          list,
+          myRank: data.myRank,
+          myData: data.myData ? this.decorate(data.myData) : null
+        })
       })
       .catch(err => {
         if (reqId === this._rankReqId) {
@@ -112,7 +112,7 @@ Page({
   onPeriodChange(e) {
     const period = e.currentTarget.dataset.period
     if (period === this.data.period) return
-    this.setData({ period, emptyText: (PERIOD_TEXT[period] || '本周') + '暂无打卡数据' })
+    this.setData({ period, emptyText: this.emptyTextFor(period) })
     this.loadRanking()
   },
 
@@ -125,5 +125,29 @@ Page({
 
   goGroups() {
     wx.switchTab({ url: '/pages/groups/groups' })
+  },
+
+  emptyTextFor(period) {
+    if (period === 'total') return '本群暂无打卡数据'
+    return (PERIOD_TEXT[period] || '本周') + '暂无打卡数据'
+  },
+
+  decorate(item) {
+    const sortBy = this.data.sortBy
+    const countText = format.compactNumber(item.count)
+    const calText = format.compactNumber(item.totalCalories)
+    const minText = format.compactNumber(item.totalDuration)
+    const isMe = item.openid === this.data.myOpenid
+    const valueText =
+      sortBy === 'count' ? countText + ' 次'
+        : sortBy === 'calories' ? calText + ' 千卡'
+          : minText + ' 分钟'
+    return {
+      ...item,
+      isMe,
+      medal: item.rank <= 3 ? item.rank : 0,
+      statLine: countText + '次 · ' + calText + '千卡 · ' + minText + '分钟',
+      valueText
+    }
   }
 })

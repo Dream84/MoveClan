@@ -164,6 +164,10 @@
   color: var(--primary);
   flex-shrink: 0;
   margin-left: 12rpx;
+  max-width: 240rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .my-rank-bar {

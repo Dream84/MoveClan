@@ -27,6 +27,11 @@
       data-period="lastMonth"
       bindtap="onPeriodChange"
     >上月</view>
+    <view
+      class="tab {{period === 'total' ? 'active' : ''}}"
+      data-period="total"
+      bindtap="onPeriodChange"
+    >总榜</view>
   </view>
 
   <view class="sorts">
@@ -82,11 +87,9 @@
           {{item.nickName}}
           <text wx:if="{{item.isMe}}" class="me-tag">我</text>
         </view>
-        <view class="rank-sub">{{item.count}}次 · {{item.totalCalories}}千卡 · {{item.totalDuration}}分钟</view>
+        <view class="rank-sub">{{item.statLine}}</view>
       </view>
-      <view class="rank-value">
-        {{sortBy === 'count' ? item.count + ' 次' : sortBy === 'calories' ? item.totalCalories + ' 千卡' : item.totalDuration + ' 分钟'}}
-      </view>
+      <view class="rank-value">{{item.valueText}}</view>
     </view>
   </view>
 
@@ -94,7 +97,7 @@
     <view class="my-rank-left" wx:if="{{myRank > 0}}">我的排名：第 {{myRank}} 名</view>
     <view class="my-rank-left" wx:else>我的排名：未上榜</view>
     <view class="my-rank-value" wx:if="{{myData}}">
-      {{myData.count}}次 · {{myData.totalCalories}}千卡 · {{myData.totalDuration}}分钟
+      {{myData.statLine}}
     </view>
   </view>
 </view>
